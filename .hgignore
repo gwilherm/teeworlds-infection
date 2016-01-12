@@ -1,0 +1,16 @@
+# use glob syntax.
+syntax: glob
+
+*.o
+*.pyc
+*.pyo
+bam
+.bam
+config.lua
+build
+src/game/generated
+__pycache__/
+scripts/work/
+SDL.dll
+freetype.dll
+autoexec.cfg

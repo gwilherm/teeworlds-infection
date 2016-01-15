@@ -20,16 +20,16 @@ void CGameControllerInfection::DoWincheck() {
         CPlayer *pPlayer = GameServer()->m_apPlayers[i];
         if (!pPlayer)
             continue;
-        
+
         if (pPlayer->GetTeam() == TEAM_SPECTATORS)
             continue;
-        
+
         if (pPlayer->Infected())
             Zombies ++;
         else
             Humans ++;
     }
-    
+
     if (Humans + Zombies < 2) {
         m_SuddenDeath = true;
         m_Warmup = 0;
@@ -39,8 +39,8 @@ void CGameControllerInfection::DoWincheck() {
         StartRound();
         return;
     }
-    
-    if (m_GameOverTick == -1 && !m_Warmup && !GameServer()->m_World.m_ResetRequested) {    
+
+    if (m_GameOverTick == -1 && !m_Warmup && !GameServer()->m_World.m_ResetRequested) {
         if (!Humans || !Zombies) {
             EndRound();
             return;
@@ -59,10 +59,10 @@ void CGameControllerInfection::OnCharacterSpawn(CCharacter *pChr) {
 }
 
 int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon) {
-	
+
 	if (!pKiller || Weapon == WEAPON_GAME)
 		return 0;
-    
+
 	if (pKiller == pVictim->GetPlayer())
 		pVictim->GetPlayer()->m_Score--; // suicide
 	else {
@@ -71,10 +71,10 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
 		else
 			pKiller->m_Score++; // normal kill
 	}
-	
+
 	if (Weapon == WEAPON_SELF)
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*3.0f;
-    
+
     pKiller->m_Kills ++;
     if (pKiller->Infected()) {
         if (pKiller->m_Kills >= g_Config.m_InfSuperJumpKills && !pKiller->m_HasSuperJump) {
@@ -88,7 +88,7 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
     } else {
         if (pKiller->m_Kills >= g_Config.m_InfAirstrikeKills && !pKiller->m_HasAirstrike) {
             pKiller->m_Kills -= g_Config.m_InfAirstrikeKills;
-            pKiller->m_HasAirstrike = false;
+            pKiller->m_HasAirstrike = true;
             GameServer()->SendBroadcast("You got an airstrike, use hammer to launch it :D", pKiller->GetCID());
             char str[512] = {0};
             sprintf(str, g_Config.m_InfAirstrikeText, Server()->ClientName(pKiller->GetCID()));

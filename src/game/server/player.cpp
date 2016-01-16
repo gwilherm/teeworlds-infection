@@ -22,7 +22,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_SpectatorID = SPEC_FREEVIEW;
 	m_LastActionTick = Server()->Tick();
 	m_TeamChangeTick = Server()->Tick();
-	
+
 	m_Zombie = 1;
 	m_Kills = 0;
 	m_HasSuperJump = false;
@@ -287,18 +287,18 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 void CPlayer::Infect(int By, int Weapon) {
     if (m_Zombie)
         return;
-        
+
     m_Zombie = 1;
-    
+
     if (m_pCharacter) {
         m_pCharacter->ClearWeapons();
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);
         m_pCharacter->SetWeapon(WEAPON_HAMMER);
     }
-        
+
     if (By == -1)
         return;
-    
+
     // send the kill message
 	CNetMsg_Sv_KillMsg Msg;
 	Msg.m_Killer = By;
@@ -306,26 +306,28 @@ void CPlayer::Infect(int By, int Weapon) {
 	Msg.m_Weapon = Weapon;
 	Msg.m_ModeSpecial = 0;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-	
+
 	if (m_pCharacter)
         GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);
+
+	GameServer()->m_pController->OnCharacterDeath(m_pCharacter, GameServer()->m_apPlayers[By], WEAPON_HAMMER);
 }
 
 void CPlayer::Cure(int By, int Weapon) {
     if (!m_Zombie)
         return;
-    
+
     m_Zombie = 0;
-    
+
     if (m_pCharacter) {
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);
         m_pCharacter->GiveWeapon(WEAPON_GUN, 10);
         m_pCharacter->SetWeapon(WEAPON_GUN);
     }
-    
+
     if (By == -1)
         return;
-    
+
     char str[512] = {0};
     sprintf(str,
             "%s was cured by %s",

@@ -78,7 +78,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Alive = true;
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
-	
+
 	m_pWall = 0;
 
 	return true;
@@ -291,7 +291,7 @@ void CCharacter::FireWeapon()
 			// reset objects Hit
 			m_NumObjectsHit = 0;
 			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
-            
+
             if (!m_pPlayer->Infected()) {
                 if (m_pPlayer->m_HasAirstrike) {
                     GameServer()->CreateAirstrike(m_Pos, m_pPlayer->GetCID());
@@ -308,7 +308,7 @@ void CCharacter::FireWeapon()
                     m_pWall = new CWall(GameWorld(), m_WallStart, m_Pos, m_pPlayer->GetCID());
                 break;
             }
-            
+
 			CCharacter *apEnts[MAX_CLIENTS];
 			int Hits = 0;
 			int Num = GameServer()->m_World.FindEntities(ProjStartPos, m_ProximityRadius*0.5f, (CEntity**)apEnts,
@@ -582,7 +582,7 @@ void CCharacter::Tick()
 
 		m_pPlayer->m_ForceBalanced = false;
 	}
-	
+
 	float PhysSize = 28.0f;
     // get ground state
 	bool Grounded = false;
@@ -590,11 +590,11 @@ void CCharacter::Tick()
 		Grounded = true;
 	if(GameServer()->Collision()->GetCollisionAt(m_Pos.x-PhysSize/2, m_Pos.y+PhysSize/2+5)&CCollision::COLFLAG_SOLID)
 		Grounded = true;
-    
+
     // super jump usage
-    if (m_pPlayer->Infected() && Grounded && m_Input.m_Jump)
+    if (m_pPlayer->Infected() && m_pPlayer->m_HasSuperJump && Grounded && m_Input.m_Jump)
         m_Core.m_Vel.y -= g_Config.m_InfSuperJumpForce;
-    
+
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
@@ -759,7 +759,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-	
+
 	if ((m_pPlayer->m_Zombie == 2 && g_Config.m_InfZombieExplodes) ||
         (m_pPlayer->m_Zombie && g_Config.m_InfZombieExplodes == 2)) {
         GameServer()->CreateExplosion(vec2(m_Pos.x - 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
@@ -767,7 +767,7 @@ void CCharacter::Die(int Killer, int Weapon)
         GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
         GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
 	}
-	
+
 	m_pPlayer->Infect();
 }
 
@@ -777,7 +777,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;
-    
+
     if (GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);
 

@@ -221,23 +221,23 @@ void CGameContext::CreateAirstrike(vec2 Pos, int Owner) {
     int Projectiles = 200;
     vec2 Align{16, 16};
     for (int x = 0; x < Projectiles; x ++) {
-        CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
-            Owner,
-            vec2((x - Projectiles/2)*Align.x + Pos.x, - abs(x - Projectiles/2) * Align.y),
-            vec2(0, 1),
-            (int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
-            1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
+		CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
+			Owner,
+			vec2((x - Projectiles/2)*Align.x + Pos.x, - abs(x - Projectiles/2) * Align.y),
+			vec2(0, 1),
+			(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
+			1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
 
-        // pack the Projectile and send it to the client Directly
-        CNetObj_Projectile p;
-        pProj->FillInfo(&p);
+		// pack the Projectile and send it to the client Directly
+		CNetObj_Projectile p;
+		pProj->FillInfo(&p);
 
-        CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
-        Msg.AddInt(1);
-        for(unsigned i = 0; i < sizeof(CNetObj_Projectile)/sizeof(int); i++)
-            Msg.AddInt(((int *)&p)[i]);
-        Server()->SendMsg(&Msg, MSGFLAG_VITAL, Owner);
-        
+		CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
+		Msg.AddInt(1);
+		for(unsigned i = 0; i < sizeof(CNetObj_Projectile)/sizeof(int); i++)
+			Msg.AddInt(((int *)&p)[i]);
+		Server()->SendMsg(&Msg, MSGFLAG_VITAL, Owner);
+
     }
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
@@ -417,7 +417,7 @@ void CGameContext::SwapTeams()
 {
 	if(!m_pController->IsTeamplay())
 		return;
-	
+
 	SendChat(-1, CGameContext::CHAT_ALL, "Teams were swapped");
 
 	for(int i = 0; i < MAX_CLIENTS; ++i)
@@ -642,7 +642,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			CNetMsg_Cl_Say *pMsg = (CNetMsg_Cl_Say *)pRawMsg;
 			int Team = pMsg->m_Team ? pPlayer->GetTeam() : CGameContext::CHAT_ALL;
-			
+
 			// trim right and set maximum length to 128 utf8-characters
 			int Length = 0;
 			const char *p = pMsg->m_pMessage;
@@ -1179,7 +1179,7 @@ void CGameContext::ConShuffleTeams(IConsole::IResult *pResult, void *pUserData)
 		if(pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
 			++PlayerTeam;
 	PlayerTeam = (PlayerTeam+1)/2;
-	
+
 	pSelf->SendChat(-1, CGameContext::CHAT_ALL, "Teams were shuffled");
 
 	for(int i = 0; i < MAX_CLIENTS; ++i)
@@ -1191,7 +1191,7 @@ void CGameContext::ConShuffleTeams(IConsole::IResult *pResult, void *pUserData)
 			else if(CounterBlue == PlayerTeam)
 				pSelf->m_apPlayers[i]->SetTeam(TEAM_RED, false);
 			else
-			{	
+			{
 				if(rand() % 2)
 				{
 					pSelf->m_apPlayers[i]->SetTeam(TEAM_BLUE, false);
@@ -1471,30 +1471,30 @@ void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *p
 void CGameContext::ConZombie(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    
+
     if (!pSelf->m_apPlayers[ClientID])
         return;
-    
+
     pSelf->m_apPlayers[ClientID]->Infect();
 }
 
 void CGameContext::ConCure(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    
+
     if (!pSelf->m_apPlayers[ClientID])
         return;
-    
+
     pSelf->m_apPlayers[ClientID]->Cure();
 }
 
 void CGameContext::ConIZombie(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    
+
     if (!pSelf->m_apPlayers[ClientID])
         return;
-    
+
     pSelf->m_apPlayers[ClientID]->Infect();
     pSelf->m_apPlayers[ClientID]->m_Zombie = 2;
 }
@@ -1502,20 +1502,20 @@ void CGameContext::ConIZombie(IConsole::IResult *pResult, void *pUserData) {
 void CGameContext::ConAirstrike(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    
+
     if (!pSelf->m_apPlayers[ClientID])
         return;
-    
+
     pSelf->m_apPlayers[ClientID]->m_HasAirstrike = true;
 }
 
 void CGameContext::ConSuperJump(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    
+
     if (!pSelf->m_apPlayers[ClientID])
         return;
-    
+
     pSelf->m_apPlayers[ClientID]->m_HasSuperJump = true;
 }
 
@@ -1546,7 +1546,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
-	
+
 	Console()->Register("zombie", "i", CFGFLAG_SERVER, ConZombie, this, "Turn someone into a zombie");
 	Console()->Register("cure", "i", CFGFLAG_SERVER, ConCure, this, "Cure someone");
 	Console()->Register("izombie", "i", CFGFLAG_SERVER, ConIZombie, this, "Turn someone into an iZombie");

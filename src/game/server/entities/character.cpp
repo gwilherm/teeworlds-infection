@@ -301,7 +301,6 @@ void CCharacter::FireWeapon()
                 if (m_pWall || m_WallStart == vec2(0, 0)) {
                     if (m_pWall) {
                         m_pWall->Reset();
-                        m_pWall = 0;
                     }
                     m_WallStart = m_Pos;
                 } else if (!m_pWall)

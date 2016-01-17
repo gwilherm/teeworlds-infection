@@ -52,6 +52,9 @@ void CWall::Tick() {
 
 void CWall::Reset() {
     GameWorld()->DestroyEntity(this);
+    if(GameServer()->GetPlayerChar(m_Owner))
+        GameServer()->GetPlayerChar(m_Owner)->m_pWall = 0;
+
 }
 
 void CWall::TickPaused() {

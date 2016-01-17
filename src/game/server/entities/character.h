@@ -65,6 +65,7 @@ public:
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
+	class CWall *m_pWall;
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
@@ -72,7 +73,6 @@ private:
 	bool m_Alive;
 	
 	vec2 m_WallStart;
-	class CWall *m_pWall;
 
 	// weapon info
 	CEntity *m_apHitObjects[10];

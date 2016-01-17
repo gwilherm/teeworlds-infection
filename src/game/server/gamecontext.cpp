@@ -218,26 +218,53 @@ void CGameContext::CreateSoundGlobal(int Sound, int Target)
 }
 
 void CGameContext::CreateAirstrike(vec2 Pos, int Owner) {
-    int Projectiles = 200;
-    vec2 Align{16, 16};
-    for (int x = 0; x < Projectiles; x ++) {
-		CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
-			Owner,
-			vec2((x - Projectiles/2)*Align.x + Pos.x, - abs(x - Projectiles/2) * Align.y),
-			vec2(0, 1),
-			(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
-			1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
+	// TODO: clean up this messy code
+	switch(g_Config.m_InfAirstrikeType)
+	{
+		default:
+		case 0:
+		{
+			const int Num = 15;
+			const int Dist = 100;
+			vec2 DropPos(Pos.x - Num*Dist, 0);
 
-		// pack the Projectile and send it to the client Directly
-		CNetObj_Projectile p;
-		pProj->FillInfo(&p);
+			for(int i = 0; i < Num*2; i++)
+			{
+				new CProjectile(&m_World, WEAPON_GRENADE,
+						Owner,
+						DropPos,
+						vec2(0, 1),
+						(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
+						1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
+				DropPos.x += Dist;
+			}
+			break;
+		}
+		case 1:
+		{
+			int Projectiles = 200;
+			vec2 Align{16, 16};
+			for (int x = 0; x < Projectiles; x ++) {
+				CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
+					Owner,
+					vec2((x - Projectiles/2)*Align.x + Pos.x, - abs(x - Projectiles/2) * Align.y),
+					vec2(0, 1),
+					(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
+					1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
 
-		CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
-		Msg.AddInt(1);
-		for(unsigned i = 0; i < sizeof(CNetObj_Projectile)/sizeof(int); i++)
-			Msg.AddInt(((int *)&p)[i]);
-		Server()->SendMsg(&Msg, MSGFLAG_VITAL, Owner);
+				// pack the Projectile and send it to the client Directly
+				CNetObj_Projectile p;
+				pProj->FillInfo(&p);
 
+				CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
+				Msg.AddInt(1);
+				for(unsigned i = 0; i < sizeof(CNetObj_Projectile)/sizeof(int); i++)
+					Msg.AddInt(((int *)&p)[i]);
+				Server()->SendMsg(&Msg, MSGFLAG_VITAL, Owner);
+
+			}
+			break;
+		}
     }
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }

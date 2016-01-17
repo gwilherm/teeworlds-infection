@@ -94,7 +94,7 @@ MACRO_CONFIG_INT(InfSuperJumpForce, inf_superjumpforce, 40, 0, 0, CFGFLAG_SERVER
 MACRO_CONFIG_INT(InfZombieExplodes, inf_zombie_explodes, 1, 0, 2, CFGFLAG_SERVER, "Zombies explode. (0 = off, 1 = IZombie, 2 = All Zombies)")
 MACRO_CONFIG_STR(InfAirstrikeText, inf_airstrike_text, 512, "Red Alert. Military gave %s an airstrike!", CFGFLAG_SERVER, "Text send when someone earns an airstrike (%s = player name)")
 MACRO_CONFIG_STR(InfSuperJumpText, inf_superjump_text, 512, "%s mutated and can now superjump!", CFGFLAG_SERVER, "Text send when someone earns superjump (%s = player name)")
-
+MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")

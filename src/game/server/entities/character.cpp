@@ -774,9 +774,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	m_Core.m_Vel += Force;
 
-	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
-		return false;
-
     if (GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);
 
@@ -798,29 +795,60 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		GameServer()->CreateDamageInd(m_Pos, 0, Dmg);
 	}
 
-	if(Dmg)
+	if(m_pPlayer->m_Zombie && GameServer()->m_apPlayers[From]->m_Zombie && Weapon == WEAPON_HAMMER)
 	{
-		if(m_Armor)
+		//Lets be nice to our zombie mates
+		if(Dmg)
 		{
-			if(Dmg > 1)
+			if(m_Armor < 10)
 			{
-				m_Health--;
-				Dmg--;
+				if(Dmg > 1)
+				{
+					m_Health = clamp(m_Health+1, 0, 10);
+					Dmg--;
+				}
+
+				if(Dmg > m_Armor)
+				{
+					Dmg -= m_Armor;
+					m_Armor = 10;
+				}
+				else
+				{
+					m_Armor = clamp(m_Armor+Dmg, 0, 10);
+					Dmg = 0;
+				}
 			}
 
-			if(Dmg > m_Armor)
-			{
-				Dmg -= m_Armor;
-				m_Armor = 0;
-			}
-			else
-			{
-				m_Armor -= Dmg;
-				Dmg = 0;
-			}
+			m_Health = clamp(m_Health+Dmg, 0, 10);
 		}
+	}
+	else if(!GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
+	{
+		if(Dmg)
+		{
+			if(m_Armor)
+			{
+				if(Dmg > 1)
+				{
+					m_Health--;
+					Dmg--;
+				}
 
-		m_Health -= Dmg;
+				if(Dmg > m_Armor)
+				{
+					Dmg -= m_Armor;
+					m_Armor = 0;
+				}
+				else
+				{
+					m_Armor -= Dmg;
+					Dmg = 0;
+				}
+			}
+
+			m_Health -= Dmg;
+		}
 	}
 
 	m_DamageTakenTick = Server()->Tick();

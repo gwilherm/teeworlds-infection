@@ -264,6 +264,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	KillCharacter();
 
 	m_Team = Team;
+	m_Zombie = true;
 	m_LastActionTick = Server()->Tick();
 	m_SpectatorID = SPEC_FREEVIEW;
 	// we got to wait 0.5 secs before respawning

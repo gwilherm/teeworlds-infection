@@ -18,7 +18,17 @@ CWall::CWall(CGameWorld *pWorld, vec2 From, vec2 To, int Owner):
 }
 
 bool CWall::HitCharacter(vec2 From, vec2 To, CCharacter *pCharacter) {
-    vec2 IntersectPos = closest_point_on_line(From, To, pCharacter->m_Pos);
+    vec2 IntersectPos;
+
+    if(distance(From, To) > 0)
+    {
+		IntersectPos = closest_point_on_line(From, To, pCharacter->m_Pos);
+	}
+	else
+	{
+		IntersectPos = From;
+	}
+
     return distance(pCharacter->m_Pos, IntersectPos) < pCharacter->m_ProximityRadius;
 }
 

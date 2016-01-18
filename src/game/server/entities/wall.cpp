@@ -27,8 +27,8 @@ void CWall::Tick() {
     if (!GameServer()->m_apPlayers[m_Owner]) {
         Reset();
         return;
-    } else if (GameServer()->m_apPlayers[m_Owner]->GetTeam() == TEAM_SPECTATORS || 
-               GameServer()->m_apPlayers[m_Owner]->Infected() || 
+    } else if (GameServer()->m_apPlayers[m_Owner]->GetTeam() == TEAM_SPECTATORS ||
+               GameServer()->m_apPlayers[m_Owner]->Infected() ||
                Server()->Tick() >= m_StartTick + Server()->TickSpeed() * g_Config.m_InfWallLife) {
         Reset();
         return;
@@ -36,16 +36,16 @@ void CWall::Tick() {
         m_Active = false;
         return;
     }
-    
+
     CCharacter *pCharacter = (CCharacter *)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER);
     while (pCharacter) {
         if (!pCharacter)
             return;
-        
+
         if (pCharacter->GetPlayer()->Infected())
             if (HitCharacter(m_Pos, m_To, pCharacter))
                 pCharacter->Die(m_Owner, WEAPON_WORLD);
-        
+
         pCharacter = (CCharacter *)pCharacter->TypeNext();
     }
 }
@@ -53,8 +53,10 @@ void CWall::Tick() {
 void CWall::Reset() {
     GameWorld()->DestroyEntity(this);
     if(GameServer()->GetPlayerChar(m_Owner))
+	{
         GameServer()->GetPlayerChar(m_Owner)->m_pWall = 0;
-
+        GameServer()->GetPlayerChar(m_Owner)->m_WallStart = vec2(0,0);
+	}
 }
 
 void CWall::TickPaused() {

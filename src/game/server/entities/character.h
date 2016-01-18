@@ -66,13 +66,13 @@ public:
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
 	class CWall *m_pWall;
+	vec2 m_WallStart;
+
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
 
 	bool m_Alive;
-	
-	vec2 m_WallStart;
 
 	// weapon info
 	CEntity *m_apHitObjects[10];

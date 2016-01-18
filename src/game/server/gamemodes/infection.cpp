@@ -75,7 +75,9 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
 	if (Weapon == WEAPON_SELF)
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*3.0f;
 
-    pKiller->m_Kills ++;
+	if (pKiller != pVictim->GetPlayer())
+		pKiller->m_Kills++;
+
     if (pKiller->Infected()) {
         if (pKiller->m_Kills >= g_Config.m_InfSuperJumpKills && !pKiller->m_HasSuperJump) {
             pKiller->m_Kills -= g_Config.m_InfSuperJumpKills;

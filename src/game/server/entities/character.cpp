@@ -774,6 +774,10 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	m_Core.m_Vel += Force;
 
+	if((!m_pPlayer->Infected()) &&
+		GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
+		return false;
+
     if (GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);
 

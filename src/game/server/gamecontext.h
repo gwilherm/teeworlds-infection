@@ -64,7 +64,7 @@ class CGameContext : public IGameServer
 	static void ConClearVotes(IConsole::IResult *pResult, void *pUserData);
 	static void ConVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	
+
 	static void ConZombie(IConsole::IResult *pResult, void *pUserData);
 	static void ConCure(IConsole::IResult *pResult, void *pUserData);
 	static void ConIZombie(IConsole::IResult *pResult, void *pUserData);
@@ -138,7 +138,9 @@ public:
 		CHAT_ALL=-2,
 		CHAT_SPEC=-1,
 		CHAT_RED=0,
-		CHAT_BLUE=1
+		CHAT_BLUE=1,
+		CHAT_WHISPER_SEND=2,
+		CHAT_WHISPER_RECV=3
 	};
 
 	// network
@@ -180,6 +182,12 @@ public:
 	virtual const char *GameType();
 	virtual const char *Version();
 	virtual const char *NetVersion();
+
+private:
+	static void ConWhisper(IConsole::IResult *pResult, void *pUserData);
+
+	void Whisper(int ClientID, char *pStr);
+	void WhisperID(int ClientID, int VictimID, char *pMessage);
 };
 
 inline int CmaskAll() { return -1; }

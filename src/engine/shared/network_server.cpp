@@ -4,8 +4,13 @@
 
 #include <engine/console.h>
 
+#include <engine/external/md5/md5.h>
+
+#include "config.h"
 #include "netban.h"
 #include "network.h"
+
+
 
 
 bool CNetServer::Open(NETADDR BindAddr, CNetBan *pNetBan, int MaxClients, int MaxClientsPerIP, int Flags)
@@ -22,12 +27,36 @@ bool CNetServer::Open(NETADDR BindAddr, CNetBan *pNetBan, int MaxClients, int Ma
 
 	// clamp clients
 	m_MaxClients = MaxClients;
+
 	if(m_MaxClients > NET_MAX_CLIENTS)
 		m_MaxClients = NET_MAX_CLIENTS;
 	if(m_MaxClients < 1)
 		m_MaxClients = 1;
 
 	m_MaxClientsPerIP = MaxClientsPerIP;
+
+	IOHANDLE urandom = io_open("/dev/urandom", IOFLAG_READ);
+	if (urandom) {
+		io_read(urandom, m_SecurityTokenSeed, sizeof(m_SecurityTokenSeed));
+		io_close(urandom);
+	}
+	else
+	{
+		dbg_msg("security", "/dev/urandom is not available. using sv_rcon_password for security token seed, make sure you have a long password!");
+		str_copy(m_SecurityTokenSeed, g_Config.m_SvRconPassword, sizeof(m_SecurityTokenSeed));
+		long timestamp = time_get();
+		md5_state_t md5;
+		md5_byte_t digest[16];
+		// do over 9000 rounds of md5 on the rcon password, to make it harder to recover the password from the token values
+		for (int i = 0; i < 1000000; i++)
+		{
+			md5_init(&md5);
+			md5_append(&md5, (unsigned char*)m_SecurityTokenSeed, sizeof(m_SecurityTokenSeed));
+			md5_append(&md5, (unsigned char*)&timestamp, sizeof(timestamp));
+			md5_finish(&md5, digest);
+			mem_copy(m_SecurityTokenSeed, digest, sizeof(m_SecurityTokenSeed) < sizeof(digest) ? sizeof(m_SecurityTokenSeed) : sizeof(digest));
+		}
+	}
 
 	for(int i = 0; i < NET_MAX_CLIENTS; i++)
 		m_aSlots[i].m_Connection.Init(m_Socket, true);
@@ -105,6 +134,17 @@ int CNetServer::Recv(CNetChunk *pChunk)
 		if(Bytes <= 0)
 			break;
 
+		// check if we just should drop the packet
+		char aBuf[128];
+		if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf)))
+		{
+			// banned, reply with a message
+			CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf)+1, NET_SECURITY_TOKEN_UNSUPPORTED);
+			continue;
+		}
+
+		bool Found = false;
+
 		if(CNetBase::UnpackPacket(m_RecvUnpacker.m_aBuffer, Bytes, &m_RecvUnpacker.m_Data) == 0)
 		{
 			// check if we just should drop the packet
@@ -112,7 +152,7 @@ int CNetServer::Recv(CNetChunk *pChunk)
 			if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf)))
 			{
 				// banned, reply with a message
-				CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf)+1);
+				CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf)+1, NET_SECURITY_TOKEN_UNSUPPORTED);
 				continue;
 			}
 
@@ -163,7 +203,7 @@ int CNetServer::Recv(CNetChunk *pChunk)
 								{
 									char aBuf[128];
 									str_format(aBuf, sizeof(aBuf), "Only %d players with the same IP are allowed", m_MaxClientsPerIP);
-									CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, aBuf, sizeof(aBuf));
+									CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, aBuf, sizeof(aBuf), NET_SECURITY_TOKEN_UNSUPPORTED);
 									return 0;
 								}
 							}
@@ -174,7 +214,22 @@ int CNetServer::Recv(CNetChunk *pChunk)
 							if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
 							{
 								Found = true;
-								m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr);
+								long timestamp = time_get();
+								md5_state_t md5;
+								md5_byte_t digest[16];
+								SECURITY_TOKEN securityToken;
+								do
+								{
+									md5_init(&md5);
+									md5_append(&md5, (unsigned char*)m_SecurityTokenSeed, sizeof(m_SecurityTokenSeed));
+									md5_append(&md5, (unsigned char*)&Addr, sizeof(Addr));
+									md5_append(&md5, (unsigned char*)&timestamp, sizeof(timestamp));
+									md5_finish(&md5, digest);
+									securityToken = *(SECURITY_TOKEN*)digest;
+									timestamp++;
+								}
+								while (securityToken == NET_SECURITY_TOKEN_UNKNOWN || securityToken == NET_SECURITY_TOKEN_UNSUPPORTED);
+								m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr, securityToken);
 								if(m_pfnNewClient)
 									m_pfnNewClient(i, m_UserPtr);
 								break;
@@ -184,7 +239,7 @@ int CNetServer::Recv(CNetChunk *pChunk)
 						if(!Found)
 						{
 							const char FullMsg[] = "This server is full";
-							CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg));
+							CNetBase::SendControlMsg(m_Socket, &Addr, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg), NET_SECURITY_TOKEN_UNSUPPORTED);
 						}
 					}
 				}

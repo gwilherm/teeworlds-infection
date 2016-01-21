@@ -719,8 +719,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					Whisper(pPlayer->GetCID(), pWhisperMsg);
 				}
 			}
-
-			SendChat(ClientID, Team, pMsg->m_pMessage);
+			else
+			{
+				SendChat(ClientID, Team, pMsg->m_pMessage);
+			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
@@ -1881,40 +1883,43 @@ void CGameContext::WhisperID(int ClientID, int VictimID, char *pMessage)
 
 	char aBuf[256];
 
-	if (m_apPlayers[ClientID] /*&& m_apPlayers[ClientID]->m_ClientVersion >= VERSION_DDNET_WHISPER*/)
+	if (m_apPlayers[ClientID]/* && m_apPlayers[ClientID]->m_ClientVersion >= VERSION_DDNET_WHISPER*/)
 	{
+/*
 		CNetMsg_Sv_Chat Msg;
 		Msg.m_Team = CHAT_WHISPER_SEND;
 		Msg.m_ClientID = VictimID;
 		Msg.m_pMessage = pMessage;
-/*
+
 		if(g_Config.m_SvDemoChat)
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 		else
-*/
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 	}
 	else
 	{
+*/
 		str_format(aBuf, sizeof(aBuf), "[→ %s] %s", Server()->ClientName(VictimID), pMessage);
 		SendChatTarget(ClientID, aBuf);
 	}
 
 	if (m_apPlayers[VictimID]/* && m_apPlayers[VictimID]->m_ClientVersion >= VERSION_DDNET_WHISPER*/)
 	{
+/*
 		CNetMsg_Sv_Chat Msg2;
 		Msg2.m_Team = CHAT_WHISPER_RECV;
 		Msg2.m_ClientID = ClientID;
 		Msg2.m_pMessage = pMessage;
-/*
+
 		if(g_Config.m_SvDemoChat)
 			Server()->SendPackMsg(&Msg2, MSGFLAG_VITAL, VictimID);
 		else
-*/
+
 			Server()->SendPackMsg(&Msg2, MSGFLAG_VITAL|MSGFLAG_NORECORD, VictimID);
 	}
 	else
 	{
+*/
 		str_format(aBuf, sizeof(aBuf), "[← %s] %s", Server()->ClientName(ClientID), pMessage);
 		SendChatTarget(VictimID, aBuf);
 	}

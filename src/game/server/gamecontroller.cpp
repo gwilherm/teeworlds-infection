@@ -33,7 +33,7 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
-	
+
 	m_NextZombie = 0;
 }
 
@@ -211,9 +211,9 @@ static bool IsSeparator(char c) { return c == ';' || c == ' ' || c == ',' || c =
 void IGameController::StartRound()
 {
 	ResetGame();
-    
+
     DoWarmup(g_Config.m_InfInfectionDelay);
-    
+
 	m_RoundStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
 	m_GameOverTick = -1;
@@ -225,7 +225,7 @@ void IGameController::StartRound()
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start round type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	
+
 	CureAll();
 }
 
@@ -239,7 +239,7 @@ void IGameController::CureAll() {
     for (int i = 0; i < MAX_CLIENTS; i ++) {
         if (!GameServer()->m_apPlayers[i])
             continue;
-        
+
         GameServer()->m_apPlayers[i]->Cure();
     }
 }
@@ -252,13 +252,13 @@ int IGameController::PickZombie() {
                 m_NextZombie = 0;
             continue;
         }
-        
+
         if (pPlayer->GetTeam() == TEAM_SPECTATORS) {
             if (++ m_NextZombie >= MAX_CLIENTS)
                 m_NextZombie = 0;
             continue;
         }
-        
+
         int id = m_NextZombie;
         pPlayer->Infect();
         pPlayer->m_Zombie = 2;
@@ -411,11 +411,11 @@ bool IGameController::IsFriendlyFire(int ClientID1, int ClientID2)
 
     if(!GameServer()->m_apPlayers[ClientID1] || !GameServer()->m_apPlayers[ClientID2])
 		return false;
-    
+
 	if(IsTeamplay())
 		if(GameServer()->m_apPlayers[ClientID1]->GetTeam() == GameServer()->m_apPlayers[ClientID2]->GetTeam())
 			return true;
-    
+
 	return !!GameServer()->m_apPlayers[ClientID1]->Infected() == !!GameServer()->m_apPlayers[ClientID2]->Infected();
 }
 
@@ -527,6 +527,11 @@ void IGameController::Tick()
 					break;
 			}
 		#endif
+
+			// Preserve bot
+			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->m_IsBot)
+				break;
+
 			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS && !Server()->IsAuthed(i))
 			{
 				if(Server()->Tick() > GameServer()->m_apPlayers[i]->m_LastActionTick+g_Config.m_SvInactiveKickTime*Server()->TickSpeed()*60)
@@ -570,6 +575,11 @@ void IGameController::Tick()
 bool IGameController::IsTeamplay() const
 {
 	return m_GameFlags&GAMEFLAG_TEAMS;
+}
+
+bool IGameController::IsFlagGame() const
+{
+	return m_GameFlags&GAMEFLAG_FLAGS;
 }
 
 void IGameController::Snap(int SnappingClient)

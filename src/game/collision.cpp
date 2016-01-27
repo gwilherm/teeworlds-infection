@@ -30,6 +30,7 @@ void CCollision::Init(class CLayers *pLayers)
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
 		int Index = m_pTiles[i].m_Index;
+		m_pTiles[i].m_Reserved = Index;
 
 		if(Index > 128)
 			continue;
@@ -51,7 +52,7 @@ void CCollision::Init(class CLayers *pLayers)
 	}
 }
 
-int CCollision::GetTile(int x, int y)
+int CCollision::GetTile(int x, int y) const
 {
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
@@ -59,13 +60,13 @@ int CCollision::GetTile(int x, int y)
 	return m_pTiles[Ny*m_Width+Nx].m_Index > 128 ? 0 : m_pTiles[Ny*m_Width+Nx].m_Index;
 }
 
-bool CCollision::IsTileSolid(int x, int y)
+bool CCollision::IsTileSolid(int x, int y) const
 {
 	return GetTile(x, y)&COLFLAG_SOLID;
 }
 
 // TODO: rewrite this smarter!
-int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision)
+int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
 {
 	float Distance = distance(Pos0, Pos1);
 	int End(Distance+1);
@@ -92,8 +93,92 @@ int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *p
 	return 0;
 }
 
+int CCollision::FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
+{
+	const int Tile0X = round_to_int(Pos0.x)/32;
+	const int Tile0Y = round_to_int(Pos0.y)/32;
+	const int Tile1X = round_to_int(Pos1.x)/32;
+	const int Tile1Y = round_to_int(Pos1.y)/32;
+
+	const float Ratio = (Tile0X == Tile1X) ? 1.f : (Pos1.y - Pos0.y) / (Pos1.x-Pos0.x);
+
+	const float DetPos = Pos0.x * Pos1.y - Pos0.y * Pos1.x;
+
+	const int DeltaTileX = (Tile0X <= Tile1X) ? 1 : -1;
+	const int DeltaTileY = (Tile0Y <= Tile1Y) ? 1 : -1;
+
+	const float DeltaError = DeltaTileY * DeltaTileX * Ratio;
+
+	int CurTileX = Tile0X;
+	int CurTileY = Tile0Y;
+	vec2 Pos = Pos0;
+
+	bool Vertical = false;
+
+	float Error = 0;
+	if(Tile0Y != Tile1Y && Tile0X != Tile1X)
+	{
+		Error = (CurTileX * Ratio - CurTileY - DetPos / (32*(Pos1.x-Pos0.x))) * DeltaTileY;
+		if(Tile0X < Tile1X)
+			Error += Ratio * DeltaTileY;
+		if(Tile0Y < Tile1Y)
+			Error -= DeltaTileY;
+	}
+
+	while(CurTileX != Tile1X || CurTileY != Tile1Y)
+	{
+		if(IsTileSolid(CurTileX*32,CurTileY*32))
+			break;
+		if(CurTileY != Tile1Y && (CurTileX == Tile1X || Error > 0))
+		{
+			CurTileY += DeltaTileY;
+			Error -= 1;
+			Vertical = false;
+		}
+		else
+		{
+			CurTileX += DeltaTileX;
+			Error += DeltaError;
+			Vertical = true;
+		}
+	}
+	if(IsTileSolid(CurTileX*32,CurTileY*32))
+	{
+		if(CurTileX != Tile0X || CurTileY != Tile0Y)
+		{
+			if(Vertical)
+			{
+				Pos.x = 32 * (CurTileX + ((Tile0X < Tile1X) ? 0 : 1));
+				Pos.y = (Pos.x * (Pos1.y - Pos0.y) - DetPos) / (Pos1.x - Pos0.x);
+			}
+			else
+			{
+				Pos.y = 32 * (CurTileY + ((Tile0Y < Tile1Y) ? 0 : 1));
+				Pos.x = (Pos.y * (Pos1.x - Pos0.x) + DetPos) / (Pos1.y - Pos0.y);
+			}
+		}
+		if(pOutCollision)
+			*pOutCollision = Pos;
+		if(pOutBeforeCollision)
+		{
+			vec2 Dir = normalize(Pos1-Pos0);
+			if(Vertical)
+				Dir *= 0.5f / absolute(Dir.x) + 1.f;
+			else
+				Dir *= 0.5f / absolute(Dir.y) + 1.f;
+			*pOutBeforeCollision = Pos - Dir;
+		}
+		return GetTile(CurTileX*32,CurTileY*32);
+	}
+	if(pOutCollision)
+		*pOutCollision = Pos1;
+	if(pOutBeforeCollision)
+		*pOutBeforeCollision = Pos1;
+	return 0;
+}
+
 // TODO: OPT: rewrite this smarter!
-void CCollision::MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces)
+void CCollision::MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces) const
 {
 	if(pBounces)
 		*pBounces = 0;
@@ -131,7 +216,7 @@ void CCollision::MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, i
 	}
 }
 
-bool CCollision::TestBox(vec2 Pos, vec2 Size)
+bool CCollision::TestBox(vec2 Pos, vec2 Size) const
 {
 	Size *= 0.5f;
 	if(CheckPoint(Pos.x-Size.x, Pos.y-Size.y))
@@ -145,7 +230,7 @@ bool CCollision::TestBox(vec2 Pos, vec2 Size)
 	return false;
 }
 
-void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity)
+void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity) const
 {
 	// do the move
 	vec2 Pos = *pInoutPos;

@@ -15,7 +15,7 @@ public:
 	union { T y,v; };
 
 	vector2_base() {}
-	vector2_base(float nx, float ny)
+	vector2_base(T nx, T ny)
 	{
 		x = nx;
 		y = ny;
@@ -26,7 +26,7 @@ public:
 	vector2_base operator +(const vector2_base &v) const { return vector2_base(x+v.x, y+v.y); }
 	vector2_base operator *(const T v) const { return vector2_base(x*v, y*v); }
 	vector2_base operator *(const vector2_base &v) const { return vector2_base(x*v.x, y*v.y); }
-	vector2_base operator /(const T v) const { return vector3_base(x/v, y/v); }
+	vector2_base operator /(const T v) const { return vector2_base(x/v, y/v); }
 	vector2_base operator /(const vector2_base &v) const { return vector2_base(x/v.x, y/v.y); }
 
 	const vector2_base &operator =(const vector2_base &v) { x = v.x; y = v.y; return *this; }
@@ -74,6 +74,12 @@ typedef vector2_base<bool> bvec2;
 typedef vector2_base<int> ivec2;
 
 template<typename T>
+inline T det(const vector2_base<T> &a, const vector2_base<T> &b)
+{
+	return a.x*b.y - a.y*b.x;
+}
+
+template<typename T>
 inline vector2_base<T> closest_point_on_line(vector2_base<T> line_point0, vector2_base<T> line_point1, vector2_base<T> target_point)
 {
 	vector2_base<T> c = target_point - line_point0;
@@ -98,7 +104,7 @@ public:
 	union { T z,b,v,l; };
 
 	vector3_base() {}
-	vector3_base(float nx, float ny, float nz)
+	vector3_base(T nx, T ny, T nz)
 	{
 		x = nx;
 		y = ny;
@@ -177,7 +183,7 @@ public:
 	union { T w,a; };
 
 	vector4_base() {}
-	vector4_base(float nx, float ny, float nz, float nw)
+	vector4_base(T nx, T ny, T nz, T nw)
 	{
 		x = nx;
 		y = ny;

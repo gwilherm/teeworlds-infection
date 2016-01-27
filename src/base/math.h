@@ -5,6 +5,9 @@
 
 #include <stdlib.h>
 
+// 0.7 compliant
+#define round_to_int(x) round(x)
+
 template <typename T>
 inline T clamp(T val, T min, T max)
 {
@@ -33,6 +36,7 @@ inline T mix(const T a, const T b, TB amount)
 	return a + (b-a)*amount;
 }
 
+inline int random_int() { return (((rand() & 0xffff) << 16) | (rand() & 0xffff)) & 0x7FFFFFFF; };
 inline float frandom() { return rand()/(float)(RAND_MAX); }
 
 // float to fixed

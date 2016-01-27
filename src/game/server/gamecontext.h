@@ -14,6 +14,7 @@
 #include "gamecontroller.h"
 #include "gameworld.h"
 #include "player.h"
+#include "botengine.h"
 
 /*
 	Tick
@@ -123,6 +124,8 @@ public:
 	CVoteOptionServer *m_pVoteOptionFirst;
 	CVoteOptionServer *m_pVoteOptionLast;
 
+	class CBotEngine *m_pBotEngine;
+
 	// helper functions
 	void CreateDamageInd(vec2 Pos, float AngleMod, int Amount);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage);
@@ -154,6 +157,9 @@ public:
 	//
 	void CheckPureTuning();
 	void SendTuningParams(int ClientID);
+
+	// Bot slots
+	void CheckBotNumber();
 
 	//
 	void SwapTeams();

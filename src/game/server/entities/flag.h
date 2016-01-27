@@ -23,6 +23,9 @@ public:
 	virtual void Reset();
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
+
+	bool IsAtStand() { return m_AtStand; }
+	CCharacter* GetCarrier() { return m_pCarryingCharacter; }
 };
 
 #endif

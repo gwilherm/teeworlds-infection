@@ -65,6 +65,13 @@ public:
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
+	// Need for bot (for now)
+	class CCharacterCore *GetCore() { return &m_Core;}
+	bool CanFire() { return m_ReloadTimer <= 0; }
+	int GetHealth() { return m_Health; }
+	int GetArmor() { return m_Armor; }
+	int GetAmmoCount(int Weapon) { return m_aWeapons[clamp(Weapon, 0,NUM_WEAPONS-1)].m_Ammo; }
+
 	class CWall *m_pWall;
 	vec2 m_WallStart;
 

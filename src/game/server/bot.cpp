@@ -173,15 +173,27 @@ void CBot::UpdateTarget()
 					int Team = m_pPlayer->GetTeam();
 					int Count = 0;
 					for(int c = 0; c < MAX_CLIENTS; c++)
-						if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() && (GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()))
+					{
+						if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
+						(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
+						(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+						{
 							Count++;
+						}
+					}
 					if(Count)
 					{
 						Count = random_int()%Count+1;
 						int c = 0;
 						for(; Count; c++)
-							if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() && (GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()))
+						{
+							if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
+							(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
+							(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+							{
 								Count--;
+							}
+						}
 						c--;
 						m_ComputeTarget.m_Pos = GameServer()->m_apPlayers[c]->GetCharacter()->GetPos();
 						m_ComputeTarget.m_Type = CTarget::TARGET_PLAYER;
@@ -215,6 +227,9 @@ void CBot::UpdateTarget()
 
 bool CBot::NeedPickup(int Type)
 {
+	if(m_pPlayer->Infected())
+		return false;
+
 	switch(Type)
 	{
 	case CTarget::TARGET_HEALTH:
@@ -464,8 +479,12 @@ void CBot::HandleWeapon(bool SeeTarget)
 			apTarget[Count++] = apTarget[0];
 			apTarget[0] =	GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
 		}
-		else if(GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() && (GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()))
-			apTarget[Count++] = GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
+		else if(GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
+				(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
+				(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+		{
+					apTarget[Count++] = GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
+		}
 	}
 	int Weapon = -1;
 	vec2 Target;

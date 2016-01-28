@@ -170,13 +170,11 @@ void CBot::UpdateTarget()
 				break;
 			case CTarget::TARGET_PLAYER:
 				{
-					int Team = m_pPlayer->GetTeam();
 					int Count = 0;
 					for(int c = 0; c < MAX_CLIENTS; c++)
 					{
 						if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-						(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
-						(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+							!sameTeam(c) && !sameClass(c))
 						{
 							Count++;
 						}
@@ -188,8 +186,7 @@ void CBot::UpdateTarget()
 						for(; Count; c++)
 						{
 							if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-							(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
-							(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+								!sameTeam(c) && !sameClass(c))
 							{
 								Count--;
 							}
@@ -464,7 +461,6 @@ void CBot::HandleWeapon(bool SeeTarget)
 	if(!pMe)
 		return;
 
-	int Team = m_pPlayer->GetTeam();
 	vec2 Pos = pMe->GetCore()->m_Pos;
 
 	CCharacterCore* apTarget[MAX_CLIENTS];
@@ -480,8 +476,7 @@ void CBot::HandleWeapon(bool SeeTarget)
 			apTarget[0] =	GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
 		}
 		else if(GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-				(GameServer()->m_apPlayers[c]->GetTeam() != Team || !GameServer()->m_pController->IsTeamplay()) &&
-				(m_pPlayer->Infected() != GameServer()->m_apPlayers[c]->Infected()))
+				!sameTeam(c) && !sameClass(c))
 		{
 					apTarget[Count++] = GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
 		}
@@ -722,6 +717,17 @@ void CBot::MakeChoice(bool UseTarget)
 	// 	m_Target = vec2(-14,28);
 	// }
 	m_Flags = Flags;
+}
+
+bool CBot::sameTeam(int player)
+{
+	return (GameServer()->m_pController->IsTeamplay() &&
+			(GameServer()->m_apPlayers[player]->GetTeam() == m_pPlayer->GetTeam()));
+}
+
+bool CBot::sameClass(int player)
+{
+	return (GameServer()->m_apPlayers[player]->Infected() == m_pPlayer->Infected());
 }
 
 void CBot::Snap(int SnappingClient)

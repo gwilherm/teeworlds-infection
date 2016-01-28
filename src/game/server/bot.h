@@ -116,6 +116,9 @@ protected:
 
 	vec2 ClosestCharacter();
 
+	bool sameTeam(int player);
+	bool sameClass(int player);
+
 public:
 	CBot(class CBotEngine *m_pBotEngine, CPlayer *pPlayer);
 	virtual ~CBot();

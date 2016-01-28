@@ -758,6 +758,22 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			else
 			{
 				SendChat(ClientID, Team, pMsg->m_pMessage);
+
+				/* bot answer in chat */
+				for(int i = 0 ; i < MAX_CLIENTS ; ++i)
+				{
+					if(!m_apPlayers[i])
+						continue;
+					if((m_apPlayers[i]->IsBot() && m_apPlayers[i]->m_pBot) &&
+						str_comp_nocase_num(pMsg->m_pMessage,
+												m_apPlayers[i]->m_pBot->GetName(),
+												str_length(m_apPlayers[i]->m_pBot->GetName())) == 0 &&
+						pMsg->m_pMessage[str_length(m_apPlayers[i]->m_pBot->GetName())] == ':')
+
+					{
+						SendChat(i, Team, m_apPlayers[i]->m_pBot->GetRepartee());
+					}
+				}
 			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)

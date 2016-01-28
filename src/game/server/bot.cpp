@@ -772,3 +772,11 @@ void CBot::Snap(int SnappingClient)
 const char *CBot::GetName() {
 	return g_BotName[m_pPlayer->GetCID()];
 }
+
+const char *CBot::GetRepartee() {
+	if(!m_pPlayer->Infected())
+		return "Shut up and kill !";
+	else
+		return "Eeeeeaaaarrrrghhh braiiiinz...";
+}
+

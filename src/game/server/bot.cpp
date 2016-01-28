@@ -490,7 +490,8 @@ void CBot::HandleWeapon(bool SeeTarget)
 		Target = apTarget[c]->m_Pos - Pos;
 		if(ClosestRange < Close)
 		{
-			Weapon = WEAPON_HAMMER;
+			if(m_pPlayer->Infected())
+				Weapon = WEAPON_HAMMER;
 			break;
 		}
 		else if(pMe->GetAmmoCount(WEAPON_RIFLE) != 0 && ClosestRange < GameServer()->Tuning()->m_LaserReach && !Collision()->FastIntersectLine(Pos, apTarget[c]->m_Pos, 0, 0))

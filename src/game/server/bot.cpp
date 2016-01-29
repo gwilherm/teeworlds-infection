@@ -49,7 +49,7 @@ void CBot::OnReset()
 	m_Genetics.NextGenome();
 	m_GenomeTick = 0;
 	UpdateTargetOrder();
-	dbg_msg("bot", "new target order %d %d %d %d %d %d %d %d", m_aTargetOrder[0], m_aTargetOrder[1], m_aTargetOrder[2], m_aTargetOrder[3], m_aTargetOrder[4], m_aTargetOrder[5], m_aTargetOrder[6], m_aTargetOrder[7]);
+	dbg_msg("bot", "%s has new target order %d %d %d %d %d %d %d %d", GetName(), m_aTargetOrder[0], m_aTargetOrder[1], m_aTargetOrder[2], m_aTargetOrder[3], m_aTargetOrder[4], m_aTargetOrder[5], m_aTargetOrder[6], m_aTargetOrder[7]);
 }
 
 void CBot::UpdateTargetOrder()
@@ -90,6 +90,12 @@ void CBot::UpdateTarget()
 	if(m_ComputeTarget.m_StartTick + 30 * GameServer()->Server()->TickSpeed() < GameServer()->Server()->Tick())
 		FindNewTarget = true;
 
+	// Target player became zombie
+	if(m_ComputeTarget.m_Type == CTarget::TARGET_PLAYER &&
+		GameServer()->m_apPlayers[m_ComputeTarget.m_PlayerCID] &&
+		sameClass(m_ComputeTarget.m_PlayerCID))
+			FindNewTarget = true;
+
 	if(m_ComputeTarget.m_Type == CTarget::TARGET_AIR)
 	{
 		float dist = distance(m_pPlayer->GetCharacter()->GetPos(), m_ComputeTarget.m_Pos);
@@ -104,6 +110,7 @@ void CBot::UpdateTarget()
 	}
 	if(FindNewTarget)
 	{
+
 		m_ComputeTarget.m_StartTick = GameServer()->Server()->Tick();
 		m_ComputeTarget.m_NeedUpdate = true;
 		m_ComputeTarget.m_Type = CTarget::TARGET_EMPTY;
@@ -296,7 +303,7 @@ void CBot::Tick()
 	UpdateTarget();
 
 	if(m_ComputeTarget.m_NeedUpdate)
-		dbg_msg("bot", "new target pos=(%f,%f) type=%d", m_ComputeTarget.m_Pos.x, m_ComputeTarget.m_Pos.y, m_ComputeTarget.m_Type);
+		dbg_msg("bot", "%s : new target pos=(%f,%f) type=%d", GetName(), m_ComputeTarget.m_Pos.x, m_ComputeTarget.m_Pos.y, m_ComputeTarget.m_Type);
 
 	UpdateEdge();
 

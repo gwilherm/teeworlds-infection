@@ -26,8 +26,8 @@ public:
     
     void Infect(int By = -1, int Weapon = WEAPON_HAMMER);
     void Cure(int By = -1, int WEAPON = WEAPON_GAME);
-    inline int Infected() { return m_Zombie; }
-    
+    inline bool Infected() { return (m_Zombie > 0); }
+
 	void Tick();
 	void PostTick();
 	void Snap(int SnappingClient);

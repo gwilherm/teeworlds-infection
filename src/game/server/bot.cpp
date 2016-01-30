@@ -202,6 +202,20 @@ void CBot::UpdateTarget()
 						m_ComputeTarget.m_Pos = GameServer()->m_apPlayers[c]->GetCharacter()->GetPos();
 						m_ComputeTarget.m_Type = CTarget::TARGET_PLAYER;
 						m_ComputeTarget.m_PlayerCID = c;
+
+						if(g_Config.m_SvBotThreatenTarget > 0)
+						{
+							if(!m_pPlayer->Infected())
+								if(g_Config.m_SvBotThreatenTarget == 1)
+									Whisper(c, "Go to hell fucking zombie !");
+								else
+									SayTo(c, "Go to hell fucking zombie !");
+							else
+								if(g_Config.m_SvBotThreatenTarget == 1)
+									Whisper(c, "Euuuuaaargh I want your braiiin...");
+								else
+									SayTo(c, "Euuuuaaargh I want your braiiin...");
+						}
 						return;
 					}
 				}
@@ -787,3 +801,29 @@ const char *CBot::GetRepartee() {
 		return "Eeeeeaaaarrrrghhh braiiiinz...";
 }
 
+void CBot::OnChatMessage(int SenderClientId)
+{
+	if(!g_Config.m_SvBotAllowChat)
+		return;
+
+	SayTo(SenderClientId, GetRepartee());
+}
+
+void CBot::SayTo(int ClientId, const char* pMessage)
+{
+	CPlayer* pPlayer = GameServer()->m_apPlayers[ClientId];
+	const char* senderName = (pPlayer->IsBot() && pPlayer->m_pBot)? pPlayer->m_pBot->GetName() : GameServer()->Server()->ClientName(ClientId);
+	char message[127];
+	str_format(message, 127, "%s: %s", senderName, pMessage);
+	Say(message);
+}
+
+void CBot::Say(const char* pMessage, int team)
+{
+	GameServer()->SendChat(m_pPlayer->GetCID(), team, pMessage);
+}
+
+void CBot::Whisper(int ClientId, const char* pMessage)
+{
+	GameServer()->WhisperID(m_pPlayer->GetCID(), ClientId, pMessage);
+}

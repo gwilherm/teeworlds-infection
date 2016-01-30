@@ -771,7 +771,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 						pMsg->m_pMessage[str_length(m_apPlayers[i]->m_pBot->GetName())] == ':')
 
 					{
-						SendChat(i, Team, m_apPlayers[i]->m_pBot->GetRepartee());
+						m_apPlayers[i]->m_pBot->OnChatMessage(ClientID);
 						break;
 					}
 				}
@@ -1988,7 +1988,7 @@ void CGameContext::Whisper(int ClientID, char *pStr)
 	WhisperID(ClientID, Victim, pMessage);
 }
 
-void CGameContext::WhisperID(int ClientID, int VictimID, char *pMessage)
+void CGameContext::WhisperID(int ClientID, int VictimID, const char *pMessage)
 {
 	if (!CheckClientID2(ClientID))
 		return;
@@ -2017,7 +2017,7 @@ void CGameContext::WhisperID(int ClientID, int VictimID, char *pMessage)
 	else
 	{
 */
-		str_format(aBuf, sizeof(aBuf), "[→ %s] %s", Server()->ClientName(VictimID), pMessage);
+		str_format(aBuf, sizeof(aBuf), "[→ %s] %s", (m_apPlayers[VictimID]->IsBot() && m_apPlayers[VictimID]->m_pBot)? m_apPlayers[VictimID]->m_pBot->GetName() : Server()->ClientName(VictimID), pMessage);
 		SendChatTarget(ClientID, aBuf);
 	}
 
@@ -2038,7 +2038,7 @@ void CGameContext::WhisperID(int ClientID, int VictimID, char *pMessage)
 	else
 	{
 */
-		str_format(aBuf, sizeof(aBuf), "[← %s] %s", Server()->ClientName(ClientID), pMessage);
+		str_format(aBuf, sizeof(aBuf), "[← %s] %s", (m_apPlayers[ClientID]->IsBot() && m_apPlayers[ClientID]->m_pBot)? m_apPlayers[ClientID]->m_pBot->GetName() : Server()->ClientName(ClientID), pMessage);
 		SendChatTarget(VictimID, aBuf);
 	}
 }

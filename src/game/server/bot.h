@@ -139,6 +139,12 @@ public:
 	CNetObj_PlayerInput GetLastInputData() { return m_LastData; }
 
 	const char *GetRepartee();
+
+	void OnChatMessage(int SenderClientId);
+	void SayTo(int ClientId, const char* pMessage);
+	void Say(const char* pMessage, int team = CGameContext::CHAT_ALL);
+	void Whisper(int ClientId, const char* pMessage);
+
 };
 
 #endif

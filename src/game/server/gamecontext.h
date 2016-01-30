@@ -189,11 +189,10 @@ public:
 	virtual const char *Version();
 	virtual const char *NetVersion();
 
-private:
 	static void ConWhisper(IConsole::IResult *pResult, void *pUserData);
 
 	void Whisper(int ClientID, char *pStr);
-	void WhisperID(int ClientID, int VictimID, char *pMessage);
+	void WhisperID(int ClientID, int VictimID, const char *pMessage);
 };
 
 inline int CmaskAll() { return -1; }

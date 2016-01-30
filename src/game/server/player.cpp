@@ -334,6 +334,9 @@ void CPlayer::Infect(int By, int Weapon) {
         GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);
 
 	GameServer()->m_pController->OnCharacterDeath(m_pCharacter, GameServer()->m_apPlayers[By], WEAPON_HAMMER);
+
+	if(IsBot() && m_pBot)
+		m_pBot->OnReset();
 }
 
 void CPlayer::Cure(int By, int Weapon) {
@@ -357,6 +360,9 @@ void CPlayer::Cure(int By, int Weapon) {
             Server()->ClientName(m_ClientID),
             GameServer()->m_apPlayers[By] ? Server()->ClientName(By) : "(unknown)");
     GameServer()->SendChatTarget(-1, str);
+
+	if(IsBot() && m_pBot)
+		m_pBot->OnReset();
 }
 
 void CPlayer::TryRespawn()

@@ -212,7 +212,6 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 {
 	if(NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING)
 	{
-		dbg_msg("player","player %d is chatting", m_ClientID);
 		// skip the input if chat is active
 		if(m_PlayerFlags&PLAYERFLAG_CHATTING)
 			return;

@@ -827,7 +827,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 			m_Health = clamp(m_Health+Dmg, 0, 10);
 		}
-
 		return true;
 	}
 	else if(!GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))

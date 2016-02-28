@@ -762,10 +762,10 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	if ((m_pPlayer->m_Zombie == 2 && g_Config.m_InfZombieExplodes) ||
         (m_pPlayer->m_Zombie && g_Config.m_InfZombieExplodes == 2)) {
-        GameServer()->CreateExplosion(vec2(m_Pos.x - 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
-        GameServer()->CreateExplosion(vec2(m_Pos.x + 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
-        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
-        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+        GameServer()->CreateExplosion(vec2(m_Pos.x - 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+        GameServer()->CreateExplosion(vec2(m_Pos.x + 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
 	}
 
 	m_pPlayer->Infect();
@@ -827,6 +827,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 			m_Health = clamp(m_Health+Dmg, 0, 10);
 		}
+
+		return true;
 	}
 	else if(!GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
 	{

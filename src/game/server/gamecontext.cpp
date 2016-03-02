@@ -718,6 +718,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					str_copy(pWhisperMsg, pMsg->m_pMessage + 9, 256);
 					Whisper(pPlayer->GetCID(), pWhisperMsg);
 				}
+				else
+				{
+					SendChatTarget(ClientID, "Unknown command.");
+				}
 			}
 			else
 			{

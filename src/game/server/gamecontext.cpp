@@ -760,7 +760,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				SendChat(ClientID, Team, pMsg->m_pMessage);
 
 				/* bot answer in chat */
-				for(int i = Server()->MaxClients(); i >= 0 ; --i)
+				for(int i = Server()->MaxClients() - 1; i >= 0 ; --i)
 				{
 					if(!m_apPlayers[i])
 						continue;

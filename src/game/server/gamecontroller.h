@@ -69,6 +69,7 @@ public:
 	bool IsTeamplay() const;
 	bool IsFlagGame() const;
 	bool IsGameOver() const { return m_GameOverTick != -1; }
+	int IsWarmup() const { return m_Warmup; };
 
 	IGameController(class CGameContext *pGameServer);
 	virtual ~IGameController();

@@ -768,7 +768,8 @@ void CCharacter::Die(int Killer, int Weapon)
         GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
 	}
 
-	m_pPlayer->Infect();
+	if(!GameServer()->m_pController->IsWarmup())
+		m_pPlayer->Infect();
 }
 
 bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)

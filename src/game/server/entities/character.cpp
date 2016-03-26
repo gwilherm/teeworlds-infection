@@ -65,6 +65,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
+	m_DiggCount = 0;
+
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
 	m_Core.m_Pos = m_Pos;
@@ -288,6 +290,19 @@ void CCharacter::FireWeapon()
 	{
 		case WEAPON_HAMMER:
 		{
+			// digging
+			if (m_pPlayer->Infected() && m_pPlayer->SpawningState() == CPlayer::DIGGING)
+			{
+				m_Core.m_Pos.y -= 16;
+				m_DiggCount++;
+				GameServer()->CreateDeath(m_Core.m_Pos, -1);
+				if(m_DiggCount >= 4)
+				{
+					m_DiggCount = 0;
+                    m_pPlayer->SetSpawningState(CPlayer::SPAWNED);
+				}
+			}
+
 			// reset objects Hit
 			m_NumObjectsHit = 0;
 			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
@@ -589,6 +604,7 @@ void CCharacter::Tick()
 		Grounded = true;
 	if(GameServer()->Collision()->GetCollisionAt(m_Pos.x-PhysSize/2, m_Pos.y+PhysSize/2+5)&CCollision::COLFLAG_SOLID)
 		Grounded = true;
+
 
     // super jump usage
     if (m_pPlayer->Infected() && m_pPlayer->m_HasSuperJump && Grounded && m_Input.m_Jump)

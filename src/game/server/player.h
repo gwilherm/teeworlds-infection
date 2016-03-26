@@ -108,6 +108,16 @@ public:
 
 	bool IsBot() { return m_IsBot; }
 
+	typedef enum
+	{
+		SPAWNED = 0,
+		DIGGING = 1,
+		SPAWNING = 2
+	} spawningState;
+
+	int SpawningState() { return m_Spawning; }
+	void SetSpawningState(int state) { m_Spawning = state; }
+
     // 0 = Human, 1 = Zomibe, 2 = iZombie
     int m_Zombie;
     int m_Kills;
@@ -122,7 +132,7 @@ private:
 	IServer *Server() const;
 
 	//
-	bool m_Spawning;
+	int m_Spawning;
 	int m_ClientID;
 	int m_Team;
 };

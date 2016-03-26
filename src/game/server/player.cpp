@@ -77,7 +77,7 @@ void CPlayer::Tick()
 			m_ViewPos -= vec2(clamp(m_ViewPos.x-m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y-m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
 		if(!m_pCharacter && m_DieTick+Server()->TickSpeed()*3 <= Server()->Tick())
-			m_Spawning = true;
+			m_Spawning = SPAWNING;
 
 		if(m_pCharacter)
 		{
@@ -93,7 +93,7 @@ void CPlayer::Tick()
 					m_pBot->OnReset();
 			}
 		}
-		else if(m_Spawning && m_RespawnTick <= Server()->Tick())
+		else if(m_Spawning == SPAWNING && m_RespawnTick <= Server()->Tick())
 			TryRespawn();
 	}
 	else
@@ -230,7 +230,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 		m_pCharacter->OnDirectInput(NewInput);
 
 	if(!m_pCharacter && m_Team != TEAM_SPECTATORS && (NewInput->m_Fire&1))
-		m_Spawning = true;
+		m_Spawning = SPAWNING;
 
 	// check for activity
 	if(NewInput->m_Direction || m_LatestActivity.m_TargetX != NewInput->m_TargetX ||
@@ -265,7 +265,7 @@ void CPlayer::KillCharacter(int Weapon)
 void CPlayer::Respawn()
 {
 	if(m_Team != TEAM_SPECTATORS)
-		m_Spawning = true;
+		m_Spawning = SPAWNING;
 }
 
 void CPlayer::SetTeam(int Team, bool DoChatMsg)
@@ -373,10 +373,10 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 
-	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos))
+	if(!GameServer()->m_pController->CanSpawn((Infected()? TEAM_BLUE:TEAM_RED), &SpawnPos))
 		return;
 
-	m_Spawning = false;
+	m_Spawning = Infected()? DIGGING:SPAWNED;
 	m_pCharacter = new(m_ClientID) CCharacter(&GameServer()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);

@@ -296,7 +296,7 @@ void CCharacter::FireWeapon()
 				m_Core.m_Pos.y -= 16;
 				m_DiggCount++;
 				if(m_DiggCount >= 3)
-					GameServer()->CreateDeath(m_Core.m_Pos, -1);
+					GameServer()->CreateDeath(m_Core.m_Pos, MAX_CLIENTS);
 				if(m_DiggCount >= 4)
 				{
 					m_DiggCount = 0;

@@ -295,11 +295,12 @@ void CCharacter::FireWeapon()
 			{
 				m_Core.m_Pos.y -= 16;
 				m_DiggCount++;
-				GameServer()->CreateDeath(m_Core.m_Pos, -1);
+				if(m_DiggCount >= 3)
+					GameServer()->CreateDeath(m_Core.m_Pos, -1);
 				if(m_DiggCount >= 4)
 				{
 					m_DiggCount = 0;
-                    m_pPlayer->SetSpawningState(CPlayer::SPAWNED);
+					m_pPlayer->SetSpawningState(CPlayer::SPAWNED);
 				}
 			}
 

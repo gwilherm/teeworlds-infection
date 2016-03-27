@@ -371,6 +371,10 @@ void CPlayer::Cure(int By, int Weapon) {
 
 void CPlayer::TryRespawn()
 {
+	// spectators can't spawn
+	if(m_Team == TEAM_SPECTATORS)
+		return;
+
 	vec2 SpawnPos;
 
 	if(!GameServer()->m_pController->CanSpawn((Infected()? TEAM_BLUE:TEAM_RED), &SpawnPos))

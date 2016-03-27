@@ -28,6 +28,10 @@ public:
     void Cure(int By = -1, int WEAPON = WEAPON_GAME);
     inline bool Infected() { return (m_Zombie > 0); }
 
+	bool IsInfTeam(int ClientID);
+
+    void SetCID(int ClientID);
+
 	void Tick();
 	void PostTick();
 	void Snap(int SnappingClient);

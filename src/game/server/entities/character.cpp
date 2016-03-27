@@ -773,7 +773,8 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
-	m_Core.m_Vel += Force;
+	if((Weapon != WEAPON_SHOTGUN) || ((Weapon == WEAPON_SHOTGUN) && !(m_pPlayer->IsInfTeam(From))))
+		m_Core.m_Vel += Force;
 
 	if((!m_pPlayer->Infected()) &&
 		GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)

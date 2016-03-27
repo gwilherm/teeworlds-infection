@@ -354,3 +354,16 @@ void CPlayer::TryRespawn()
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);
 }
+
+bool CPlayer::IsInfTeam(int ClientID)
+{
+	bool res = false;
+
+	CPlayer* pPlayer = GameServer()->m_apPlayers[ClientID];
+	if(pPlayer)
+	{
+		res = (Infected() == pPlayer->Infected());
+	}
+
+	return res;
+}

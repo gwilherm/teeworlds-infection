@@ -107,6 +107,8 @@ MACRO_CONFIG_INT(SvBotThreatenTarget, sv_bot_threaten_target, 1, 0, 2, CFGFLAG_S
 MACRO_CONFIG_INT(SvBotDrawTarget, sv_bot_draw_target, 0, 0, 1, CFGFLAG_SERVER, "Show bot target")
 MACRO_CONFIG_INT(SvBotEngineDrawGraph, sv_botengine_draw_graph, 0, 0, 1, CFGFLAG_SERVER, "Draw graph")
 
+MACRO_CONFIG_INT(SvShotgunForce, sv_shotgun_force, 0, 0, 256, CFGFLAG_SERVER, "Shotgun force")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")

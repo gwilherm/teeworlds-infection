@@ -72,6 +72,8 @@ public:
 	int GetArmor() { return m_Armor; }
 	int GetAmmoCount(int Weapon) { return m_aWeapons[clamp(Weapon, 0,NUM_WEAPONS-1)].m_Ammo; }
 
+	void ResetWall();
+
 	class CWall *m_pWall;
 	vec2 m_WallStart;
 

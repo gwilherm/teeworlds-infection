@@ -23,7 +23,7 @@ public:
 	void SetTeam(int Team, bool DoChatMsg=true);
 	int GetTeam() const { return m_Team; }
 	int GetCID() const { return m_ClientID; }
-    
+
     void Infect(int By = -1, int Weapon = WEAPON_HAMMER);
     void Cure(int By = -1, int WEAPON = WEAPON_GAME);
     inline bool Infected() { return (m_Zombie > 0); }
@@ -103,13 +103,18 @@ public:
 		int m_Min;
 		int m_Max;
 	} m_Latency;
-    
-    // 0 = Human, 1 = Zomibe, 2 = iZombie
+
+    enum
+    {
+		HUMAN = 0,
+		ZOMBIE = 1,
+		I_ZOMBIE = 2
+    };
     int m_Zombie;
     int m_Kills;
     bool m_HasSuperJump;
     bool m_HasAirstrike;
-    
+
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

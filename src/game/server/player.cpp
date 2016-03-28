@@ -23,7 +23,11 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_LastActionTick = Server()->Tick();
 	m_TeamChangeTick = Server()->Tick();
 
-	m_Zombie = 1;
+	if(GameServer()->m_pController->IsWarmup())
+		m_Zombie = HUMAN;
+	else
+		m_Zombie = ZOMBIE;
+
 	m_Kills = 0;
 	m_HasSuperJump = false;
 	m_HasAirstrike = false;
@@ -129,7 +133,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
-	StrToInts(&pClientInfo->m_Clan0, 3, m_Zombie ? m_Zombie == 1 ? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
+	StrToInts(&pClientInfo->m_Clan0, 3, m_Zombie ? m_Zombie == ZOMBIE ? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : m_TeeInfos.m_SkinName);
 	pClientInfo->m_UseCustomColor = m_Zombie ? true : false;
@@ -266,9 +270,9 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	m_Team = Team;
 
 	if(GameServer()->m_pController->IsWarmup())
-		m_Zombie = 0;
+		m_Zombie = HUMAN;
 	else
-		m_Zombie = 1;
+		m_Zombie = ZOMBIE;
 
 	m_LastActionTick = Server()->Tick();
 	m_SpectatorID = SPEC_FREEVIEW;
@@ -294,7 +298,7 @@ void CPlayer::Infect(int By, int Weapon) {
     if (m_Zombie)
         return;
 
-    m_Zombie = 1;
+    m_Zombie = ZOMBIE;
 
     if (m_pCharacter) {
         m_pCharacter->ClearWeapons();
@@ -323,7 +327,7 @@ void CPlayer::Cure(int By, int Weapon) {
     if (!m_Zombie)
         return;
 
-    m_Zombie = 0;
+    m_Zombie = HUMAN;
 
     if (m_pCharacter) {
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);

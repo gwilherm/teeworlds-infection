@@ -97,6 +97,7 @@ MACRO_CONFIG_STR(InfSuperJumpText, inf_superjump_text, 512, "%s mutated and can 
 MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
 
 MACRO_CONFIG_INT(SvShotgunForce, sv_shotgun_force, 0, 0, 256, CFGFLAG_SERVER, "Shotgun force")
+MACRO_CONFIG_INT(SvAllowFriendlyShotgun, sv_allow_friendly_shotgun, 0, 0, 1, CFGFLAG_SERVER, "Allow humans to blow each other away with the shotgun")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

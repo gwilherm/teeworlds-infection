@@ -48,8 +48,18 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Armor = 0;
 }
 
+void CCharacter::ResetWall()
+{
+	if (m_pWall) {
+		m_pWall->Reset();
+	}
+	m_WallStart == vec2(0, 0);
+	m_pWall = 0;
+}
+
 void CCharacter::Reset()
 {
+	ResetWall();
 	Destroy();
 }
 
@@ -79,7 +89,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
 
-	m_pWall = 0;
+	ResetWall();
 
 	return true;
 }
@@ -299,9 +309,7 @@ void CCharacter::FireWeapon()
                     break;
                 }
                 if (m_pWall || m_WallStart == vec2(0, 0)) {
-                    if (m_pWall) {
-                        m_pWall->Reset();
-                    }
+					ResetWall();
                     m_WallStart = m_Pos;
                 } else if (!m_pWall)
                     m_pWall = new CWall(GameWorld(), m_WallStart, m_Pos, m_pPlayer->GetCID());
@@ -766,6 +774,8 @@ void CCharacter::Die(int Killer, int Weapon)
         GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
         GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
 	}
+
+	ResetWall();
 
 	if(!GameServer()->m_pController->IsWarmup())
 		m_pPlayer->Infect();

@@ -65,6 +65,8 @@ public:
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
+	void ResetWall();
+
 	class CWall *m_pWall;
 	vec2 m_WallStart;
 

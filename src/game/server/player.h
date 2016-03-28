@@ -110,7 +110,12 @@ public:
 
 	bool IsBot() { return m_IsBot; }
 
-    // 0 = Human, 1 = Zomibe, 2 = iZombie
+    enum
+    {
+		HUMAN = 0,
+		ZOMBIE = 1,
+		I_ZOMBIE = 2
+    };
     int m_Zombie;
     int m_Kills;
     bool m_HasSuperJump;

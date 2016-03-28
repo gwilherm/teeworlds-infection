@@ -23,7 +23,11 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_LastActionTick = Server()->Tick();
 	m_TeamChangeTick = Server()->Tick();
 
-	m_Zombie = 1;
+	if(GameServer()->m_pController->IsWarmup())
+		m_Zombie = HUMAN;
+	else
+		m_Zombie = ZOMBIE;
+
 	m_Kills = 0;
 	m_HasSuperJump = false;
 	m_HasAirstrike = false;
@@ -287,9 +291,9 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	m_Team = Team;
 
 	if(GameServer()->m_pController->IsWarmup())
-		m_Zombie = 0;
+		m_Zombie = HUMAN;
 	else
-		m_Zombie = 1;
+		m_Zombie = ZOMBIE;
 
 	m_LastActionTick = Server()->Tick();
 	m_SpectatorID = SPEC_FREEVIEW;
@@ -315,7 +319,7 @@ void CPlayer::Infect(int By, int Weapon) {
     if (m_Zombie)
         return;
 
-    m_Zombie = 1;
+    m_Zombie = ZOMBIE;
 
     if (m_pCharacter) {
         m_pCharacter->ClearWeapons();
@@ -347,7 +351,7 @@ void CPlayer::Cure(int By, int Weapon) {
     if (!m_Zombie)
         return;
 
-    m_Zombie = 0;
+    m_Zombie = HUMAN;
 
     if (m_pCharacter) {
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);

@@ -261,7 +261,7 @@ int IGameController::PickZombie() {
 
         int id = m_NextZombie;
         pPlayer->Infect();
-        pPlayer->m_Zombie = 2;
+        pPlayer->m_Zombie = CPlayer::I_ZOMBIE;
         if (++ m_NextZombie >= MAX_CLIENTS)
             m_NextZombie = 0;
         return id;

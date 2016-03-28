@@ -1642,7 +1642,7 @@ void CGameContext::ConIZombie(IConsole::IResult *pResult, void *pUserData) {
         return;
 
     pSelf->m_apPlayers[ClientID]->Infect();
-    pSelf->m_apPlayers[ClientID]->m_Zombie = 2;
+    pSelf->m_apPlayers[ClientID]->m_Zombie = CPlayer::I_ZOMBIE;
 }
 
 void CGameContext::ConAirstrike(IConsole::IResult *pResult, void *pUserData) {

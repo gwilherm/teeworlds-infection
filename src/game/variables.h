@@ -108,6 +108,7 @@ MACRO_CONFIG_INT(SvBotDrawTarget, sv_bot_draw_target, 0, 0, 1, CFGFLAG_SERVER, "
 MACRO_CONFIG_INT(SvBotEngineDrawGraph, sv_botengine_draw_graph, 0, 0, 1, CFGFLAG_SERVER, "Draw graph")
 
 MACRO_CONFIG_INT(SvShotgunForce, sv_shotgun_force, 0, 0, 256, CFGFLAG_SERVER, "Shotgun force")
+MACRO_CONFIG_INT(SvAllowFriendlyShotgun, sv_allow_friendly_shotgun, 0, 0, 1, CFGFLAG_SERVER, "Allow humans to blow each other away with the shotgun")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

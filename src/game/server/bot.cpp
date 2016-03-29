@@ -93,7 +93,7 @@ void CBot::UpdateTarget()
 	// Target player became zombie
 	if(m_ComputeTarget.m_Type == CTarget::TARGET_PLAYER &&
 		GameServer()->m_apPlayers[m_ComputeTarget.m_PlayerCID] &&
-		sameClass(m_ComputeTarget.m_PlayerCID))
+		sameInfTeam(m_ComputeTarget.m_PlayerCID))
 			FindNewTarget = true;
 
 	if(m_ComputeTarget.m_Type == CTarget::TARGET_AIR)
@@ -181,7 +181,7 @@ void CBot::UpdateTarget()
 					for(int c = 0; c < MAX_CLIENTS; c++)
 					{
 						if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-							!sameTeam(c) && !sameClass(c))
+							!sameTeam(c) && !sameInfTeam(c))
 						{
 							Count++;
 						}
@@ -193,7 +193,7 @@ void CBot::UpdateTarget()
 						for(; Count; c++)
 						{
 							if(c != m_pPlayer->GetCID() && GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-								!sameTeam(c) && !sameClass(c))
+								!sameTeam(c) && !sameInfTeam(c))
 							{
 								Count--;
 							}
@@ -497,7 +497,7 @@ void CBot::HandleWeapon(bool SeeTarget)
 			apTarget[0] =	GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
 		}
 		else if(GameServer()->m_apPlayers[c] && GameServer()->m_apPlayers[c]->GetCharacter() &&
-				!sameTeam(c) && !sameClass(c))
+				!sameTeam(c) && !sameInfTeam(c))
 		{
 					apTarget[Count++] = GameServer()->m_apPlayers[c]->GetCharacter()->GetCore();
 		}
@@ -747,9 +747,9 @@ bool CBot::sameTeam(int player)
 			(GameServer()->m_apPlayers[player]->GetTeam() == m_pPlayer->GetTeam()));
 }
 
-bool CBot::sameClass(int player)
+bool CBot::sameInfTeam(int player)
 {
-	return (GameServer()->m_apPlayers[player]->Infected() == m_pPlayer->Infected());
+	return m_pPlayer->IsInfTeam(player);
 }
 
 void CBot::Snap(int SnappingClient)

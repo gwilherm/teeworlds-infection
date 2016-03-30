@@ -303,6 +303,11 @@ bool CBot::FindPickup(int Type, vec2 *pPos, float Radius)
 	return Found;
 }
 
+bool CBot::NeedToDigUp()
+{
+	return m_pPlayer->Infected() && m_pPlayer->SpawningState() == CPlayer::DIGGING;
+}
+
 bool CBot::IsGrounded()
 {
 	return m_pPlayer->GetCharacter()->IsGrounded();
@@ -326,6 +331,13 @@ void CBot::Tick()
 	m_InputData.m_WantedWeapon = m_LastData.m_WantedWeapon;
 
 	vec2 Pos = pMe->m_Pos;
+
+	if(NeedToDigUp())
+	{
+		DigUp();
+		m_LastData = m_InputData;
+		return;
+	}
 
 	bool InSight = false;
 	if(m_ComputeTarget.m_Type == CTarget::TARGET_PLAYER)
@@ -620,6 +632,12 @@ void CBot::HandleWeapon(bool SeeTarget)
 	// Accuracy
 	float Angle = angle(m_Target) + (random_int()%64-32)*pi / 1024.0f;
 	m_Target = direction(Angle)*length(m_Target);
+}
+
+void CBot::DigUp()
+{
+	m_InputData.m_WantedWeapon = WEAPON_HAMMER;
+	m_InputData.m_Fire = m_LastData.m_Fire^1;
 }
 
 void CBot::UpdateEdge()

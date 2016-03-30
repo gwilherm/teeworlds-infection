@@ -106,9 +106,11 @@ protected:
 
 	bool NeedPickup(int Type);
 	bool FindPickup(int Type, vec2 *pPos, float Radius = 1000);
+	bool NeedToDigUp();
 
 	void HandleWeapon(bool SeeTarget);
 	void HandleHook(bool SeeTarget);
+	void DigUp();
 	void UpdateEdge();
 	void MakeChoice(bool UseTarget);
 

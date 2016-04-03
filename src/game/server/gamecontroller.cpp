@@ -41,6 +41,11 @@ IGameController::~IGameController()
 {
 }
 
+bool IGameController::IsGraveSpawningMap()
+{
+	return !!(str_comp_num("infg_", g_Config.m_SvMap, 5) == 0);
+}
+
 float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
 {
 	float Score = 0.0f;
@@ -117,12 +122,20 @@ bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
 	}
 	else
 	{
+
+	}*/
+	if(IsGraveSpawningMap() && (g_Config.m_InfUGSpawnZombies))
+	{
+		Eval.m_FriendlyTeam = Team;
+		EvaluateSpawnType(&Eval, 1+(Team&1));
+	}
+	else
+	{
 		EvaluateSpawnType(&Eval, 0);
 		EvaluateSpawnType(&Eval, 1);
-		EvaluateSpawnType(&Eval, 2);
-	}*/
-	Eval.m_FriendlyTeam = Team;
-	EvaluateSpawnType(&Eval, 1+(Team&1));
+		if(!IsGraveSpawningMap())
+			EvaluateSpawnType(&Eval, 2);
+	}
 
 	*pOutPos = Eval.m_Pos;
 	return Eval.m_Got;

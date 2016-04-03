@@ -95,6 +95,7 @@ MACRO_CONFIG_INT(InfZombieExplodes, inf_zombie_explodes, 1, 0, 2, CFGFLAG_SERVER
 MACRO_CONFIG_STR(InfAirstrikeText, inf_airstrike_text, 512, "Red Alert. Military gave %s an airstrike!", CFGFLAG_SERVER, "Text send when someone earns an airstrike (%s = player name)")
 MACRO_CONFIG_STR(InfSuperJumpText, inf_superjump_text, 512, "%s mutated and can now superjump!", CFGFLAG_SERVER, "Text send when someone earns superjump (%s = player name)")
 MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
+MACRO_CONFIG_INT(InfUGSpawnZombies, inf_underground_spawn_zombies, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
 
 //Server Bots
 MACRO_CONFIG_INT(SvBotSlots, sv_bot_slots, 2, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Number of slots to reserve for bots")
@@ -105,7 +106,7 @@ MACRO_CONFIG_INT(SvBotAllowFire, sv_bot_allow_fire, 1, 0, 1, CFGFLAG_SERVER, "Bo
 MACRO_CONFIG_INT(SvBotAllowChat, sv_bot_allow_chat, 1, 0, 1, CFGFLAG_SERVER, "Bots answers in chat")
 MACRO_CONFIG_INT(SvBotThreatenTarget, sv_bot_threaten_target, 1, 0, 2, CFGFLAG_SERVER, "Bots threaten its target in chat (0 = off, 1 = whisper, 2 = public)")
 MACRO_CONFIG_INT(SvBotDrawTarget, sv_bot_draw_target, 0, 0, 1, CFGFLAG_SERVER, "Show bot target")
-MACRO_CONFIG_INT(SvBotEngineDrawGraph, sv_botengine_draw_graph, 0, 0, 1, CFGFLAG_SERVER, "Draw graph")
+MACRO_CONFIG_INT(SvBotEngineDrawGraph, sv_botengine_draw_graph, 0, 0, 1, CFGFLAG_SERVER, "Active underground spawning zombies on maps providing underground spanw points")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

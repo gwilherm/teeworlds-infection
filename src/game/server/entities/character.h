@@ -110,7 +110,7 @@ private:
 	int m_LastAction;
 	int m_LastNoAmmoSound;
 
-	int m_DiggCount;
+	int m_DigCount;
 
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_LatestPrevInput;

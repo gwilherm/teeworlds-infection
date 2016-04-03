@@ -380,7 +380,8 @@ void CPlayer::TryRespawn()
 	if(!GameServer()->m_pController->CanSpawn((Infected()? TEAM_BLUE:TEAM_RED), &SpawnPos))
 		return;
 
-	m_Spawning = Infected()? DIGGING:SPAWNED;
+	bool ugspawning_zombies = (GameServer()->m_pController->IsGraveSpawningMap() && (g_Config.m_InfUGSpawnZombies));
+	m_Spawning = (ugspawning_zombies && Infected())? DIGGING:SPAWNED;
 	m_pCharacter = new(m_ClientID) CCharacter(&GameServer()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);

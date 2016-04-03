@@ -65,7 +65,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
-	m_DiggCount = 0;
+	m_DigCount = 0;
 
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
@@ -294,12 +294,12 @@ void CCharacter::FireWeapon()
 			if (m_pPlayer->Infected() && m_pPlayer->SpawningState() == CPlayer::DIGGING)
 			{
 				m_Core.m_Pos.y -= 16;
-				m_DiggCount++;
-				if(m_DiggCount >= 3)
+				m_DigCount++;
+				if(m_DigCount >= 3)
 					GameServer()->CreateDeath(m_Core.m_Pos, MAX_CLIENTS);
-				if(m_DiggCount >= 4)
+				if(m_DigCount >= 4)
 				{
-					m_DiggCount = 0;
+					m_DigCount = 0;
 					m_pPlayer->SetSpawningState(CPlayer::SPAWNED);
 				}
 			}

@@ -99,6 +99,18 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type)
 	}
 }
 
+bool IGameController::Fortune(unsigned int percentage)
+{
+        int n;
+        percentage = (percentage > 100)? 100 : percentage;
+        // Modulo bias
+        while((n = rand()) >= (RAND_MAX - RAND_MAX % 100)){};
+        n %= 100;
+
+        return ((n - (int)percentage) < 0);
+}
+
+
 bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
 {
 	CSpawnEval Eval;
@@ -126,15 +138,18 @@ bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
 	}*/
 	if(IsGraveSpawningMap() && (g_Config.m_InfUGSpawnZombies))
 	{
+		if((g_Config.m_InfAntiCampSpawn > 0) && (Team == 1))
+			if(Fortune(g_Config.m_InfAntiCampSpawn))
+				Team = 2;
+
 		Eval.m_FriendlyTeam = Team;
-		EvaluateSpawnType(&Eval, 1+(Team&1));
+		EvaluateSpawnType(&Eval, Team);
 	}
 	else
 	{
 		EvaluateSpawnType(&Eval, 0);
-		EvaluateSpawnType(&Eval, 1);
 		if(!IsGraveSpawningMap())
-			EvaluateSpawnType(&Eval, 2);
+			EvaluateSpawnType(&Eval, 1);
 	}
 
 	*pOutPos = Eval.m_Pos;

@@ -37,6 +37,7 @@ protected:
 		float m_Score;
 	};
 
+	bool Fortune(unsigned int percentage);
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos);
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type);
 	bool EvaluateSpawn(class CPlayer *pP, vec2 *pPos);

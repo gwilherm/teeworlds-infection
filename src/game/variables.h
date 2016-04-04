@@ -96,6 +96,8 @@ MACRO_CONFIG_STR(InfAirstrikeText, inf_airstrike_text, 512, "Red Alert. Military
 MACRO_CONFIG_STR(InfSuperJumpText, inf_superjump_text, 512, "%s mutated and can now superjump!", CFGFLAG_SERVER, "Text send when someone earns superjump (%s = player name)")
 MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
 MACRO_CONFIG_INT(InfUGSpawnZombies, inf_underground_spawn_zombies, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
+MACRO_CONFIG_INT(InfAntiCampSpawn, inf_anticamp_spawn, 0, 0, 50, CFGFLAG_SERVER, "Anti camp spawn rate in % (0 = off)")
+
 
 //Server Bots
 MACRO_CONFIG_INT(SvBotSlots, sv_bot_slots, 2, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Number of slots to reserve for bots")

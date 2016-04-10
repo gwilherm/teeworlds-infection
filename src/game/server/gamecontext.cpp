@@ -1709,6 +1709,24 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->Unmute();
 }
 
+void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+
+    int x = pResult->GetInteger(1);
+    int y = pResult->GetInteger(2);
+
+    if (!pSelf->m_apPlayers[ClientID])
+        return;
+
+	if(!pSelf->m_apPlayers[ClientID]->GetCharacter())
+		return;
+
+
+	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(vec2(x, y));
+}
+
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1745,6 +1763,8 @@ void CGameContext::OnConsoleInit()
 
 	Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute player");
 	Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute player");
+
+	Console()->Register("tp", "iii", CFGFLAG_SERVER, ConTeleport, this, "Teleport player");
 
 }
 

@@ -74,6 +74,8 @@ public:
 
 	void ResetWall();
 
+	void SetPos(vec2 pos);
+
 	class CWall *m_pWall;
 	vec2 m_WallStart;
 

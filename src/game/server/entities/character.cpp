@@ -913,6 +913,11 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	return true;
 }
 
+void CCharacter::SetPos(vec2 pos)
+{
+	m_Core.m_Pos = pos;
+}
+
 void CCharacter::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient))

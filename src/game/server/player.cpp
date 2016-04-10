@@ -31,6 +31,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_Kills = 0;
 	m_HasSuperJump = false;
 	m_HasAirstrike = false;
+
+	m_Muted = false;
 }
 
 CPlayer::~CPlayer()

@@ -710,13 +710,19 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					char pWhisperMsg[256];
 					str_copy(pWhisperMsg, pMsg->m_pMessage + 3, 256);
-					Whisper(pPlayer->GetCID(), pWhisperMsg);
+					if(!pPlayer->IsMuted())
+						Whisper(pPlayer->GetCID(), pWhisperMsg);
+					else
+						SendChatTarget(ClientID, "You have been muted.");
 				}
 				else if (str_comp_nocase_num(pMsg->m_pMessage+1, "whisper ", 8) == 0)
 				{
 					char pWhisperMsg[256];
 					str_copy(pWhisperMsg, pMsg->m_pMessage + 9, 256);
-					Whisper(pPlayer->GetCID(), pWhisperMsg);
+					if(!pPlayer->IsMuted())
+						Whisper(pPlayer->GetCID(), pWhisperMsg);
+					else
+						SendChatTarget(ClientID, "You have been muted.");
 				}
 				else
 				{
@@ -725,7 +731,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 			else
 			{
-				SendChat(ClientID, Team, pMsg->m_pMessage);
+				if(!pPlayer->IsMuted())
+					SendChat(ClientID, Team, pMsg->m_pMessage);
+				else
+					SendChatTarget(ClientID, "You have been muted.");
 			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
@@ -860,9 +869,24 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				}
 
-				str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to move '%s' to spectators (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), pReason);
-				str_format(aDesc, sizeof(aDesc), "move '%s' to spectators", Server()->ClientName(SpectateID));
-				str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay);
+				if(str_comp("mute", pReason) == 0)
+				{
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
+					str_format(aDesc, sizeof(aDesc), "mute '%s'", Server()->ClientName(SpectateID));
+					str_format(aCmd, sizeof(aCmd), "mute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
+				}
+				else if(str_comp("unmute", pReason) == 0)
+				{
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to unmute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
+					str_format(aDesc, sizeof(aDesc), "unmute '%s'", Server()->ClientName(SpectateID));
+					str_format(aCmd, sizeof(aCmd), "unmute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
+				}
+				else
+				{
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to move '%s' to spectators (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), pReason);
+					str_format(aDesc, sizeof(aDesc), "move '%s' to spectators", Server()->ClientName(SpectateID));
+					str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
+				}
 			}
 
 			if(aCmd[0])
@@ -1602,6 +1626,26 @@ void CGameContext::ConSuperJump(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->m_HasSuperJump = true;
 }
 
+void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+
+    if (!pSelf->m_apPlayers[ClientID])
+        return;
+
+    pSelf->m_apPlayers[ClientID]->Mute();
+}
+
+void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+
+    if (!pSelf->m_apPlayers[ClientID])
+        return;
+
+    pSelf->m_apPlayers[ClientID]->Unmute();
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1635,6 +1679,10 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("izombie", "i", CFGFLAG_SERVER, ConIZombie, this, "Turn someone into an iZombie");
 	Console()->Register("airstrike", "i", CFGFLAG_SERVER, ConAirstrike, this, "Give airstrike to a player");
 	Console()->Register("superjump", "i", CFGFLAG_SERVER, ConSuperJump, this, "Give superjump to a zombie");
+
+	Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute player");
+	Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute player");
+
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)

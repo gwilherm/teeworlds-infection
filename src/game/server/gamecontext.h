@@ -71,6 +71,9 @@ class CGameContext : public IGameServer
 	static void ConAirstrike(IConsole::IResult *pResult, void *pUserData);
 	static void ConSuperJump(IConsole::IResult *pResult, void *pUserData);
 
+	static void ConMute(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnmute(IConsole::IResult *pResult, void *pUserData);
+
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
 

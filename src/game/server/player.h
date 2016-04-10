@@ -32,6 +32,10 @@ public:
 
     void SetCID(int ClientID);
 
+	void Mute() { m_Muted = true; }
+	void Unmute() { m_Muted = false; }
+    bool IsMuted() { return m_Muted; }
+
 	void Tick();
 	void PostTick();
 	void Snap(int SnappingClient);
@@ -132,6 +136,7 @@ private:
 	bool m_Spawning;
 	int m_ClientID;
 	int m_Team;
+	bool m_Muted;
 };
 
 #endif

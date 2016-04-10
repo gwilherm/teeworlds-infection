@@ -33,6 +33,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_HasAirstrike = false;
 
 	m_IsBot = false;
+
+	m_Muted = false;
 }
 
 CPlayer::~CPlayer()

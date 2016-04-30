@@ -1660,12 +1660,12 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->Unmute();
 }
 
-void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData) {
+void CGameContext::ConTeleportAbsPos(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
-    int x = pResult->GetInteger(1);
-    int y = pResult->GetInteger(2);
+    int x = pResult->GetInteger(1) * 32;
+    int y = pResult->GetInteger(2) * 32;
 
     if (!pSelf->m_apPlayers[ClientID])
         return;
@@ -1677,6 +1677,38 @@ void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData) {
 	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(vec2(x, y));
 }
 
+void CGameContext::ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+
+    int x = pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos.x + pResult->GetInteger(1) * 32;
+    int y = pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos.y + pResult->GetInteger(2) * 32;
+
+    if (!pSelf->m_apPlayers[ClientID])
+        return;
+
+	if(!pSelf->m_apPlayers[ClientID]->GetCharacter())
+		return;
+
+
+	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(vec2(x, y));
+}
+
+void CGameContext::ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+
+    int ClientID1 = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+    int ClientID2 = clamp(pResult->GetInteger(1), 0, MAX_CLIENTS - 1);
+
+    if (!pSelf->m_apPlayers[ClientID1] || !pSelf->m_apPlayers[ClientID2])
+        return;
+
+	if(!pSelf->m_apPlayers[ClientID2]->GetCharacter() || !pSelf->m_apPlayers[ClientID2]->GetCharacter())
+		return;
+
+
+	pSelf->m_apPlayers[ClientID1]->GetCharacter()->SetPos(pSelf->m_apPlayers[ClientID2]->GetCharacter()->m_Pos + vec2(1,-1));
+}
 
 void CGameContext::OnConsoleInit()
 {
@@ -1715,7 +1747,9 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute player");
 	Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute player");
 
-	Console()->Register("tp", "iii", CFGFLAG_SERVER, ConTeleport, this, "Teleport player");
+	Console()->Register("tp", "iii", CFGFLAG_SERVER, ConTeleportAbsPos, this, "Teleport player to pos (absolute)");
+	Console()->Register("tpr", "iii", CFGFLAG_SERVER, ConTeleportRelPos, this, "Teleport player to pos (relative)");
+	Console()->Register("tpp", "ii", CFGFLAG_SERVER, ConTeleportToPlayer, this, "Teleport player to player pos");
 
 }
 

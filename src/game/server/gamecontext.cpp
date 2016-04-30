@@ -837,16 +837,30 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(KickID, aBufKick);
 					return;
 				}
-
-				str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to kick '%s' (%s)", Server()->ClientName(ClientID), Server()->ClientName(KickID), pReason);
-				str_format(aDesc, sizeof(aDesc), "Kick '%s'", Server()->ClientName(KickID));
-				if (!g_Config.m_SvVoteKickBantime)
-					str_format(aCmd, sizeof(aCmd), "kick %d Kicked by vote", KickID);
+				if(str_comp("mute", pReason) == 0)
+				{
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s'", Server()->ClientName(ClientID), Server()->ClientName(KickID));
+					str_format(aDesc, sizeof(aDesc), "Mute '%s'", Server()->ClientName(KickID));
+					str_format(aCmd, sizeof(aCmd), "mute %d", KickID, g_Config.m_SvVoteSpectateRejoindelay, KickID);
+				}
+				else if(str_comp("unmute", pReason) == 0)
+				{
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to unmute '%s'", Server()->ClientName(ClientID), Server()->ClientName(KickID));
+					str_format(aDesc, sizeof(aDesc), "Unmute '%s'", Server()->ClientName(KickID));
+					str_format(aCmd, sizeof(aCmd), "unmute %d", KickID, g_Config.m_SvVoteSpectateRejoindelay, KickID);
+				}
 				else
 				{
-					char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
-					Server()->GetClientAddr(KickID, aAddrStr, sizeof(aAddrStr));
-					str_format(aCmd, sizeof(aCmd), "ban %s %d Banned by vote", aAddrStr, g_Config.m_SvVoteKickBantime);
+                    str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to kick '%s' (%s)", Server()->ClientName(ClientID), Server()->ClientName(KickID), pReason);
+                    str_format(aDesc, sizeof(aDesc), "Kick '%s'", Server()->ClientName(KickID));
+                    if (!g_Config.m_SvVoteKickBantime)
+                        str_format(aCmd, sizeof(aCmd), "kick %d Kicked by vote", KickID);
+                    else
+                    {
+                        char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
+                        Server()->GetClientAddr(KickID, aAddrStr, sizeof(aAddrStr));
+                        str_format(aCmd, sizeof(aCmd), "ban %s %d Banned by vote", aAddrStr, g_Config.m_SvVoteKickBantime);
+                    }
 				}
 			}
 			else if(str_comp_nocase(pMsg->m_Type, "spectate") == 0)
@@ -872,13 +886,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if(str_comp("mute", pReason) == 0)
 				{
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
-					str_format(aDesc, sizeof(aDesc), "mute '%s'", Server()->ClientName(SpectateID));
+					str_format(aDesc, sizeof(aDesc), "Mute '%s'", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "mute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
 				}
 				else if(str_comp("unmute", pReason) == 0)
 				{
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to unmute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
-					str_format(aDesc, sizeof(aDesc), "unmute '%s'", Server()->ClientName(SpectateID));
+					str_format(aDesc, sizeof(aDesc), "Unmute '%s'", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "unmute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
 				}
 				else

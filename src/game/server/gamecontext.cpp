@@ -1766,7 +1766,7 @@ void CGameContext::ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserDa
     if (!pSelf->m_apPlayers[ClientID1] || !pSelf->m_apPlayers[ClientID2])
         return;
 
-	if(!pSelf->m_apPlayers[ClientID2]->GetCharacter() || !pSelf->m_apPlayers[ClientID2]->GetCharacter())
+	if(!pSelf->m_apPlayers[ClientID1]->GetCharacter() || !pSelf->m_apPlayers[ClientID2]->GetCharacter())
 		return;
 
 

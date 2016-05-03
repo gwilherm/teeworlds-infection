@@ -111,6 +111,7 @@ public:
 	void SendVoteSet(int ClientID);
 	void SendVoteStatus(int ClientID, int Total, int Yes, int No);
 	void AbortVoteKickOnDisconnect(int ClientID);
+    void AbortVote();
 
 	int m_VoteCreator;
 	int64 m_VoteCloseTime;

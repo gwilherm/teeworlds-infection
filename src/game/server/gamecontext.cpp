@@ -414,6 +414,11 @@ void CGameContext::AbortVoteKickOnDisconnect(int ClientID)
 		m_VoteCloseTime = -1;
 }
 
+void CGameContext::AbortVote()
+{
+	if(m_VoteCloseTime)
+		m_VoteCloseTime = -1;
+}
 
 void CGameContext::CheckPureTuning()
 {
@@ -497,7 +502,7 @@ void CGameContext::OnTick()
 	// update voting
 	if(m_VoteCloseTime)
 	{
-		// abort the kick-vote on player-leave
+		// abort the kick-vote on player-leave or if caller vote no
 		if(m_VoteCloseTime == -1)
 		{
 			SendChat(-1, CGameContext::CHAT_ALL, "Vote aborted");
@@ -981,15 +986,21 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(!m_VoteCloseTime)
 				return;
 
+			CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
+			if(!pMsg->m_Vote)
+				return;
+
 			if(pPlayer->m_Vote == 0)
 			{
-				CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
-				if(!pMsg->m_Vote)
-					return;
-
 				pPlayer->m_Vote = pMsg->m_Vote;
 				pPlayer->m_VotePos = ++m_VotePos;
 				m_VoteUpdate = true;
+			}
+			else
+			{
+				// Vote caller aborted the vote by voting no
+				if((ClientID == m_VoteCreator) && (pMsg->m_Vote < 0))
+					AbortVote();
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETTEAM && !m_World.m_Paused)

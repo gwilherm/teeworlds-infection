@@ -1755,8 +1755,8 @@ void CGameContext::ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
-    int x = pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos.x + pResult->GetInteger(1) * 32;
-    int y = pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos.y + pResult->GetInteger(2) * 32;
+    int x = pResult->GetInteger(1) * 32;
+    int y = pResult->GetInteger(2) * 32;
 
     if (!pSelf->m_apPlayers[ClientID])
         return;
@@ -1765,7 +1765,7 @@ void CGameContext::ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData
 		return;
 
 
-	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(vec2(x, y));
+	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos + vec2(x, y));
 }
 
 void CGameContext::ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserData) {

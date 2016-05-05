@@ -321,8 +321,6 @@ void CPlayer::Infect(int By, int Weapon) {
     if (m_Zombie)
         return;
 
-    m_Zombie = ZOMBIE;
-
     if (m_pCharacter) {
         m_pCharacter->ClearWeapons();
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);
@@ -330,7 +328,10 @@ void CPlayer::Infect(int By, int Weapon) {
     }
 
     if (By == -1)
+    {
+        m_Zombie = ZOMBIE;
         return;
+    }
 
     // send the kill message
 	CNetMsg_Sv_KillMsg Msg;
@@ -345,8 +346,11 @@ void CPlayer::Infect(int By, int Weapon) {
 
 	GameServer()->m_pController->OnCharacterDeath(m_pCharacter, GameServer()->m_apPlayers[By], WEAPON_HAMMER);
 
+    m_Zombie = ZOMBIE;
+
 	if(IsBot() && m_pBot)
 		m_pBot->OnReset();
+
 }
 
 void CPlayer::Cure(int By, int Weapon) {

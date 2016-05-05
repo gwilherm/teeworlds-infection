@@ -67,10 +67,17 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
 	if (pKiller == pVictim->GetPlayer())
 		pVictim->GetPlayer()->m_Score--; // suicide
 	else {
-		if (IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam())
-			pKiller->m_Score--; // teamkill
+		if((IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam()) ||
+            IsFriendlyFire(pVictim->GetPlayer()->GetCID(), pKiller->GetCID()))
+        {
+            // teamkill
+            pKiller->m_Score -= g_Config.m_SvTkPenalty;
+        }
 		else
-			pKiller->m_Score++; // normal kill
+        {
+            // normal kill
+            pKiller->m_Score++;
+        }
 	}
 
 	if (Weapon == WEAPON_SELF)

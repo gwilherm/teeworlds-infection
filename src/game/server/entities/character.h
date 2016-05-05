@@ -114,6 +114,10 @@ private:
 	int m_LastAction;
 	int m_LastNoAmmoSound;
 
+	int m_LastDamagerID;
+	int m_LastDamagerWeapon;
+	int m_DamageInfoTick;
+
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_LatestPrevInput;
 	CNetObj_PlayerInput m_LatestInput;

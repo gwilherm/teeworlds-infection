@@ -75,6 +75,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
+	m_LastDamagerID = pPlayer->GetCID();
+
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
 	m_Core.m_Pos = m_Pos;
@@ -602,6 +604,12 @@ void CCharacter::Tick()
     if (m_pPlayer->Infected() && m_pPlayer->m_HasSuperJump && Grounded && m_Input.m_Jump)
         m_Core.m_Vel.y -= g_Config.m_InfSuperJumpForce;
 
+    if (m_Core.m_Vel == vec2(0, 0) ||
+        m_DamageTakenTick + Server()->TickSpeed() * g_Config.m_SvPunishTime <= Server()->Tick()) {
+        m_LastDamagerID = m_pPlayer->GetCID();
+        m_LastDamagerWeapon = WEAPON_GAME;
+    }
+
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
@@ -612,7 +620,7 @@ void CCharacter::Tick()
 		GameServer()->Collision()->GetCollisionAt(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f)&CCollision::COLFLAG_DEATH ||
 		GameLayerClipped(m_Pos))
 	{
-		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+		Die(m_LastDamagerID, m_LastDamagerWeapon);
 	}
 
 	// handle Weapons
@@ -786,9 +794,15 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if((Weapon != WEAPON_SHOTGUN) || ((Weapon == WEAPON_SHOTGUN) && !(m_pPlayer->IsInfTeam(From))) || g_Config.m_SvAllowFriendlyShotgun)
 		m_Core.m_Vel += Force;
 
+    m_LastDamagerID = From;
+    m_LastDamagerWeapon = Weapon;
+
 	if((!m_pPlayer->Infected()) &&
 		GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
+	{
+	    m_DamageTakenTick = Server()->Tick();
 		return false;
+	}
 
     if (GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);

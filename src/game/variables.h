@@ -99,6 +99,9 @@ MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvShotgunForce, sv_shotgun_force, 0, 0, 256, CFGFLAG_SERVER, "Shotgun force")
 MACRO_CONFIG_INT(SvAllowFriendlyShotgun, sv_allow_friendly_shotgun, 0, 0, 1, CFGFLAG_SERVER, "Allow humans to blow each other away with the shotgun")
 
+MACRO_CONFIG_INT(SvPunishTime, sv_punish_time, 3, 0, 0, CFGFLAG_SERVER, "The time while player could be in 'punished' mode(in seconds)")
+MACRO_CONFIG_INT(SvTkPenalty, sv_teamkill_penalty, 2, 0, 10, CFGFLAG_SERVER, "The amount of point to decrease teamkiller's score")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")

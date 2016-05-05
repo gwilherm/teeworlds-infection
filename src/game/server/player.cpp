@@ -309,7 +309,10 @@ void CPlayer::Infect(int By, int Weapon) {
     }
 
     if (By == -1)
+    {
+        m_Zombie = ZOMBIE;
         return;
+    }
 
     // send the kill message
 	CNetMsg_Sv_KillMsg Msg;

@@ -300,8 +300,6 @@ void CPlayer::Infect(int By, int Weapon) {
     if (m_Zombie)
         return;
 
-    m_Zombie = ZOMBIE;
-
     if (m_pCharacter) {
         m_pCharacter->ClearWeapons();
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);
@@ -326,6 +324,8 @@ void CPlayer::Infect(int By, int Weapon) {
         GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);
 
 	GameServer()->m_pController->OnCharacterDeath(m_pCharacter, GameServer()->m_apPlayers[By], WEAPON_HAMMER);
+
+    m_Zombie = ZOMBIE;
 }
 
 void CPlayer::Cure(int By, int Weapon) {

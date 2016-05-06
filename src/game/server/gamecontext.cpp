@@ -774,7 +774,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			char aDesc[VOTE_DESC_LENGTH] = {0};
 			char aCmd[VOTE_CMD_LENGTH] = {0};
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
-			const char *pReason = pMsg->m_Reason[0] ? pMsg->m_Reason : "No reason given";
+			const char *pReason = pMsg->m_Reason;
 
 			if(str_comp_nocase(pMsg->m_Type, "option") == 0)
 			{
@@ -915,7 +915,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(aCmd[0])
 			{
 				SendChat(-1, CGameContext::CHAT_ALL, aChatmsg);
-				StartVote(aDesc, aCmd, pReason);
+				StartVote(aDesc, aCmd, pReason[0]? pReason : "No reason given");
 				pPlayer->m_Vote = 1;
 				pPlayer->m_VotePos = m_VotePos = 1;
 				m_VoteCreator = ClientID;

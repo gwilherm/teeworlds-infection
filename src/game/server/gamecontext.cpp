@@ -842,14 +842,16 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(KickID, aBufKick);
 					return;
 				}
-				if(str_comp("mute", pReason) == 0)
+				if(str_comp_num("mute", pReason, 4) == 0)
 				{
+				    pReason = &pReason[4];
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s'", Server()->ClientName(ClientID), Server()->ClientName(KickID));
 					str_format(aDesc, sizeof(aDesc), "Mute '%s'", Server()->ClientName(KickID));
 					str_format(aCmd, sizeof(aCmd), "mute %d", KickID, g_Config.m_SvVoteSpectateRejoindelay, KickID);
 				}
-				else if(str_comp("unmute", pReason) == 0)
+				else if(str_comp_num("unmute", pReason, 6) == 0)
 				{
+				    pReason = &pReason[6];
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to unmute '%s'", Server()->ClientName(ClientID), Server()->ClientName(KickID));
 					str_format(aDesc, sizeof(aDesc), "Unmute '%s'", Server()->ClientName(KickID));
 					str_format(aCmd, sizeof(aCmd), "unmute %d", KickID, g_Config.m_SvVoteSpectateRejoindelay, KickID);
@@ -888,14 +890,16 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				}
 
-				if(str_comp("mute", pReason) == 0)
+				if(str_comp_num("mute", pReason, 4) == 0)
 				{
+				    pReason = &pReason[4];
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
 					str_format(aDesc, sizeof(aDesc), "Mute '%s'", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "mute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
 				}
-				else if(str_comp("unmute", pReason) == 0)
+				else if(str_comp_num("unmute", pReason, 6) == 0)
 				{
+				    pReason = &pReason[6];
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to unmute '%s'", Server()->ClientName(ClientID), Server()->ClientName(SpectateID));
 					str_format(aDesc, sizeof(aDesc), "Unmute '%s'", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "unmute %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay, SpectateID);
@@ -1658,6 +1662,10 @@ void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData) {
     if (!pSelf->m_apPlayers[ClientID])
         return;
 
+    char aBuf[50];
+    str_format(aBuf, sizeof(aBuf), "%s has been muted.", pSelf->Server()->ClientName(ClientID));
+	pSelf->SendChatTarget(-1, aBuf);
+
     pSelf->m_apPlayers[ClientID]->Mute();
 }
 
@@ -1667,6 +1675,10 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
 
     if (!pSelf->m_apPlayers[ClientID])
         return;
+
+    char aBuf[50];
+    str_format(aBuf, sizeof(aBuf), "%s has been unmuted.", pSelf->Server()->ClientName(ClientID));
+	pSelf->SendChatTarget(-1, aBuf);
 
     pSelf->m_apPlayers[ClientID]->Unmute();
 }

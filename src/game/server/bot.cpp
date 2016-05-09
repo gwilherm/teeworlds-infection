@@ -336,14 +336,16 @@ void CBot::Tick()
 		m_RealTarget = pClosest->m_Pos;
 	}
 
-	MakeChoice(InSight);
+    if(g_Config.m_SvBotAllowMove)
+        MakeChoice(InSight);
 
 	m_RealTarget = m_Target + Pos;
 
 	if(g_Config.m_SvBotAllowFire && m_pPlayer->GetCharacter()->CanFire())
 		HandleWeapon(InSight);
 
-	HandleHook(InSight);
+    if(g_Config.m_SvBotAllowMove && g_Config.m_SvBotAllowHook)
+		HandleHook(InSight);
 
 	if(m_Flags & BFLAG_LEFT)
 			m_InputData.m_Direction = -1;
@@ -527,60 +529,64 @@ void CBot::HandleWeapon(bool SeeTarget)
 
 		vec2 aProjectilePos[BOT_HOOK_DIRS];
 
-		for(int i = 0 ; i < BOT_HOOK_DIRS ; i++) {
-			vec2 dir = direction(2*i*pi / BOT_HOOK_DIRS);
-			aProjectilePos[i] = Pos + dir*28.*0.75;
-		}
+		vec2 aTargetPos[MAX_CLIENTS];
+		vec2 aTargetVel[MAX_CLIENTS];
+
 		const int Weapons[] = {WEAPON_GRENADE, WEAPON_SHOTGUN, WEAPON_GUN};
 		for(int j = 0 ; j < 3 ; j++)
 		{
 			if(!pMe->GetAmmoCount(Weapons[j]))
 				continue;
-			float Curvature, Speed, DTime;
+			float Curvature = 0, Speed = 0, Time = 0;
 			switch(Weapons[j])
 			{
 				case WEAPON_GRENADE:
 					Curvature = GameServer()->Tuning()->m_GrenadeCurvature;
 					Speed = GameServer()->Tuning()->m_GrenadeSpeed;
-					DTime = GameServer()->Tuning()->m_GrenadeLifetime / 10.;
+					Time = GameServer()->Tuning()->m_GrenadeLifetime;
 					break;
 
 				case WEAPON_SHOTGUN:
 					Curvature = GameServer()->Tuning()->m_ShotgunCurvature;
 					Speed = GameServer()->Tuning()->m_ShotgunSpeed;
-					DTime = GameServer()->Tuning()->m_ShotgunLifetime / 10.;
+					Time = GameServer()->Tuning()->m_ShotgunLifetime;
 					break;
 
 				case WEAPON_GUN:
 					Curvature = GameServer()->Tuning()->m_GunCurvature;
 					Speed = GameServer()->Tuning()->m_GunSpeed;
-					DTime = GameServer()->Tuning()->m_GunLifetime / 10.;
+					Time = GameServer()->Tuning()->m_GunLifetime;
 					break;
 			}
 
-			int DTick = (int) (DTime*GameServer()->Server()->TickSpeed());
-			DTime *= Speed;
-			Curvature *= 0.00001f;
-
-			vec2 aTargetPos[MAX_CLIENTS];
-			vec2 aTargetVel[MAX_CLIENTS];
+			const int NbLoops = 10;
+			//DTime /= NbLoops;
+			int DTick = (int) (Time * GameServer()->Server()->TickSpeed() / NbLoops);
+			// DTime *= Speed;
+			// Curvature *= 0.00001f;
 
 			for(int c = 0; c < Count; c++)
 			{
 				aTargetPos[c] = apTarget[c]->m_Pos;
-				aTargetVel[c] = apTarget[c]->m_Vel;
+                aTargetVel[c] = apTarget[c]->m_Vel*DTick;
+			}
+
+			for(int i = 0 ; i < BOT_HOOK_DIRS ; i++) {
+				vec2 dir = direction(2*i*pi / BOT_HOOK_DIRS);
+				aProjectilePos[i] = Pos + dir*28.*0.75;
 			}
 
 			int aIsDead[BOT_HOOK_DIRS] = {0};
 
-			for(int k = 0; k < 10 && GoodDir == -1; k++) {
+			for(int k = 0; k < NbLoops && GoodDir == -1; k++) {
 				for(int i = 0; i < BOT_HOOK_DIRS; i++) {
 					if(aIsDead[i])
 						continue;
 					vec2 dir = direction(2*i*pi / BOT_HOOK_DIRS);
-					vec2 NextPos = aProjectilePos[i];
-					NextPos.x += dir.x*DTime;
-					NextPos.y += dir.y*DTime + Curvature*(DTime*DTime)*(2*k+1);
+					vec2 NextPos = CalcPos(Pos + dir*28.*0.75, dir, Curvature, Speed, (k+1) * Time / NbLoops);
+					// vec2 NextPos = aProjectilePos[i];
+					// NextPos.x += dir.x*DTime;
+					// NextPos.y += dir.y*DTime + Curvature*(DTime*DTime)*(2*k+1);
 					aIsDead[i] = Collision()->FastIntersectLine(aProjectilePos[i], NextPos, &NextPos, 0);
 					for(int c = 0; c < Count; c++)
 					{
@@ -594,7 +600,8 @@ void CBot::HandleWeapon(bool SeeTarget)
 				}
 				for(int c = 0; c < Count; c++)
 				{
-					Collision()->FastIntersectLine(aTargetPos[c], aTargetPos[c]+aTargetVel[c], 0, &aTargetPos[c]);
+					Collision()->MoveBox(&aTargetPos[c], &aTargetVel[c], vec2(28.f,28.f), 0);
+					//Collision()->FastIntersectLine(aTargetPos[c], aTargetPos[c]+aTargetVel[c], 0, &aTargetPos[c]);
 					aTargetVel[c].y += GameServer()->Tuning()->m_Gravity*DTick*DTick;
 				}
 			}

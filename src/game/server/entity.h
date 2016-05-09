@@ -155,7 +155,7 @@ public:
 	*/
 	vec2 m_Pos;
 
-	vec2 GetPos() { return m_Pos; }
+	vec2 GetPos() const { return m_Pos; }
 };
 
 #endif

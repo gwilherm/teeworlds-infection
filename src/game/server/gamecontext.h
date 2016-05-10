@@ -79,7 +79,8 @@ class CGameContext : public IGameServer
 	static void ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData);
 	static void ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserData);
 
-	static void ConRelativeTeleport(IConsole::IResult *pResult, void *pUserData);
+    void Teleport(CCharacter* pCharacter, vec2 pos);
+
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
 

@@ -1655,7 +1655,8 @@ void CGameContext::ConSuperJump(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->m_HasSuperJump = true;
 }
 
-void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData) {
+void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData)
+{
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
@@ -1669,7 +1670,8 @@ void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->Mute();
 }
 
-void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
+void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData)
+{
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
@@ -1683,54 +1685,71 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->Unmute();
 }
 
-void CGameContext::ConTeleportAbsPos(IConsole::IResult *pResult, void *pUserData) {
-    CGameContext *pSelf = (CGameContext *)pUserData;
-    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+void CGameContext::ConTeleportAbsPos(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
-    int x = pResult->GetInteger(1) * 32;
-    int y = pResult->GetInteger(2) * 32;
+	int x = pResult->GetInteger(1) * 32;
+	int y = pResult->GetInteger(2) * 32;
 
-    if (!pSelf->m_apPlayers[ClientID])
-        return;
-
-	if(!pSelf->m_apPlayers[ClientID]->GetCharacter())
-		return;
-
-
-	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(vec2(x, y));
+	pSelf->Teleport(pSelf->m_apPlayers[ClientID]->GetCharacter(), vec2(x, y));
 }
 
-void CGameContext::ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData) {
-    CGameContext *pSelf = (CGameContext *)pUserData;
-    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+void CGameContext::ConTeleportRelPos(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
 
-    int x = pResult->GetInteger(1) * 32;
-    int y = pResult->GetInteger(2) * 32;
+	int x = pResult->GetInteger(1) * 32;
+	int y = pResult->GetInteger(2) * 32;
 
-    if (!pSelf->m_apPlayers[ClientID])
-        return;
-
-	if(!pSelf->m_apPlayers[ClientID]->GetCharacter())
+	if (!pSelf->m_apPlayers[ClientID])
 		return;
 
+	CCharacter* pCharacter = pSelf->m_apPlayers[ClientID]->GetCharacter();
 
-	pSelf->m_apPlayers[ClientID]->GetCharacter()->SetPos(pSelf->m_apPlayers[ClientID]->GetCharacter()->m_Pos + vec2(x, y));
+	if(!pCharacter)
+		return;
+
+	vec2 pos = pCharacter->m_Pos + vec2(x, y);
+
+	pSelf->Teleport(pCharacter, pos);
 }
 
-void CGameContext::ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserData) {
-    CGameContext *pSelf = (CGameContext *)pUserData;
+void CGameContext::ConTeleportToPlayer(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
 
-    int ClientID1 = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
-    int ClientID2 = clamp(pResult->GetInteger(1), 0, MAX_CLIENTS - 1);
+	int ClientID1 = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+	int ClientID2 = clamp(pResult->GetInteger(1), 0, MAX_CLIENTS - 1);
 
-    if (!pSelf->m_apPlayers[ClientID1] || !pSelf->m_apPlayers[ClientID2])
-        return;
-
-	if(!pSelf->m_apPlayers[ClientID1]->GetCharacter() || !pSelf->m_apPlayers[ClientID2]->GetCharacter())
+	if (!pSelf->m_apPlayers[ClientID1] || !pSelf->m_apPlayers[ClientID2])
 		return;
 
+	CCharacter* pCharacter1 = pSelf->m_apPlayers[ClientID1]->GetCharacter();
+	CCharacter* pCharacter2 = pSelf->m_apPlayers[ClientID2]->GetCharacter();
 
-	pSelf->m_apPlayers[ClientID1]->GetCharacter()->SetPos(pSelf->m_apPlayers[ClientID2]->GetCharacter()->m_Pos + vec2(1,-1));
+	if(!pCharacter1 || !pCharacter2)
+		return;
+
+	vec2 pos = pCharacter2->m_Pos + vec2(1,-1);
+
+	pSelf->Teleport(pCharacter1, pos);
+}
+
+void CGameContext::Teleport(CCharacter* pCharacter, vec2 pos)
+{
+	if(!pCharacter)
+		return;
+
+	if(g_Config.m_SvTpEffects)
+	{
+		CreatePlayerSpawn(pCharacter->m_Pos);
+		CreatePlayerSpawn(pos);
+	}
+
+	pCharacter->SetPos(pos);
 }
 
 void CGameContext::OnConsoleInit()

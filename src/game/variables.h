@@ -102,6 +102,8 @@ MACRO_CONFIG_INT(SvAllowFriendlyShotgun, sv_allow_friendly_shotgun, 0, 0, 1, CFG
 MACRO_CONFIG_INT(SvPunishTime, sv_punish_time, 3, 0, 0, CFGFLAG_SERVER, "The time while player could be in 'punished' mode(in seconds)")
 MACRO_CONFIG_INT(SvTkPenalty, sv_teamkill_penalty, 2, 0, 10, CFGFLAG_SERVER, "The amount of point to decrease teamkiller's score")
 
+MACRO_CONFIG_INT(SvTpEffects, sv_tp_effects, 1, 0, 1, CFGFLAG_SERVER, "Render effects on teleport command")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")

@@ -804,7 +804,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		return false;
 	}
 
-    if (GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
+    if (GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);
 
 	// m_pPlayer only inflicts half damage on self

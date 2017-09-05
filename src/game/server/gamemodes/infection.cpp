@@ -10,7 +10,7 @@
 
 CGameControllerInfection::CGameControllerInfection(class CGameContext *pGameServer)
 : IGameController(pGameServer) {
-	m_pGameType = "bModInf";
+    m_pGameType = "bInfection";
 	m_BroadcastTime = 0;
 	m_NextZombie = 0;
 }

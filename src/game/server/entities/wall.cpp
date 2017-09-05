@@ -52,7 +52,8 @@ void CWall::Tick() {
         if (!pCharacter)
             return;
 
-        if (pCharacter->GetPlayer()->Infected())
+        if (pCharacter->GetPlayer()->Infected() &&
+                !pCharacter->GetPlayer()->SpawnProtection())
             if (HitCharacter(m_Pos, m_To, pCharacter))
                 pCharacter->Die(m_Owner, WEAPON_WORLD);
 

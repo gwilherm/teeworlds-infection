@@ -46,6 +46,8 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_ProximityRadius = ms_PhysSize;
 	m_Health = 0;
 	m_Armor = 0;
+
+    m_SpawnProtectIndicatorID = Server()->SnapNewID();
 }
 
 void CCharacter::ResetWall()
@@ -75,7 +77,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
-	m_LastDamagerID = pPlayer->GetCID();
+    m_LastDamagerID = pPlayer->GetCID();
 
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
@@ -100,6 +102,12 @@ void CCharacter::Destroy()
 {
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	m_Alive = false;
+
+    if(m_SpawnProtectIndicatorID >= 0)
+    {
+        Server()->SnapFreeID(m_SpawnProtectIndicatorID);
+        m_SpawnProtectIndicatorID = -1;
+    }
 }
 
 void CCharacter::SetWeapon(int W)
@@ -939,6 +947,18 @@ void CCharacter::Snap(int SnappingClient)
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
+
+    if(m_pPlayer->Infected() && m_pPlayer->SpawnProtection())
+    {
+        CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_SpawnProtectIndicatorID, sizeof(CNetObj_Pickup)));
+        if(!pP)
+            return;
+
+        pP->m_X = (int)m_Pos.x;
+        pP->m_Y = (int)m_Pos.y - 60.0;
+        pP->m_Type = POWERUP_ARMOR;
+        pP->m_Subtype = 0;
+    }
 
 	// write down the m_Core
 	if(!m_ReckoningTick || GameServer()->m_World.m_Paused)

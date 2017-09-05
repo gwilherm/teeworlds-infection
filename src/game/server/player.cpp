@@ -351,6 +351,11 @@ void CPlayer::Cure(int By, int Weapon) {
     GameServer()->SendChatTarget(-1, str);
 }
 
+bool CPlayer::SpawnProtection()
+{
+    return (m_RespawnTick+Server()->TickSpeed()*g_Config.m_InfSafeSpawnDelay) >= Server()->Tick();
+}
+
 void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;

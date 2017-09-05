@@ -3,10 +3,12 @@ This infection mod is a FOSS clone of original Gravity's infection mod. Based on
 
 
 ## New features ##
+* Anti zombie selfkill
+* Anti spawnkill
 * Whisper command (private messages) : /w [name] [message]
 * Fast emote bubble display
 * Eye-emotes change with bubble
-
+* Shotgun knockback
 
 ## Security ##
 * east's IP spoofing protection (Only for DDNet and H-Client users)

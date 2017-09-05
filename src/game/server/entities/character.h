@@ -118,6 +118,9 @@ private:
 	int m_LastDamagerWeapon;
 	int m_DamageInfoTick;
 
+    int m_SpawnProtectIndicatorID;
+
+
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_LatestPrevInput;
 	CNetObj_PlayerInput m_LatestInput;

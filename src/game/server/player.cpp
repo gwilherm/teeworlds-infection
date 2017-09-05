@@ -379,6 +379,11 @@ void CPlayer::Cure(int By, int Weapon) {
 		m_pBot->OnReset();
 }
 
+bool CPlayer::SpawnProtection()
+{
+    return (m_RespawnTick+Server()->TickSpeed()*g_Config.m_InfSafeSpawnDelay) >= Server()->Tick();
+}
+
 void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;

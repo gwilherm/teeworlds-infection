@@ -785,11 +785,14 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	if ((m_pPlayer->m_Zombie == 2 && g_Config.m_InfZombieExplodes) ||
         (m_pPlayer->m_Zombie && g_Config.m_InfZombieExplodes == 2)) {
-        GameServer()->CreateExplosion(vec2(m_Pos.x - 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
-        GameServer()->CreateExplosion(vec2(m_Pos.x + 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
-        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
-        GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
-	}
+        if((Weapon != WEAPON_SELF) || g_Config.m_InfAllowZombieSelfkill)
+        {
+            GameServer()->CreateExplosion(vec2(m_Pos.x - 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+            GameServer()->CreateExplosion(vec2(m_Pos.x + 32, m_Pos.y), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+            GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y - 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+            GameServer()->CreateExplosion(vec2(m_Pos.x, m_Pos.y + 32), m_pPlayer->GetCID(), WEAPON_HAMMER, false, 4);
+        }
+    }
 
 	ResetWall();
 

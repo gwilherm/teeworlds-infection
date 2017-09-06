@@ -135,7 +135,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
-	StrToInts(&pClientInfo->m_Clan0, 3, m_Zombie ? m_Zombie == ZOMBIE ? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
+	StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : m_TeeInfos.m_SkinName);
 	pClientInfo->m_UseCustomColor = m_Zombie ? true : false;

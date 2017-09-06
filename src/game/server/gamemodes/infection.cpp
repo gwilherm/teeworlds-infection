@@ -80,28 +80,32 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
 	}
 
 	if (Weapon == WEAPON_SELF)
+    {
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*3.0f;
+    }
+    else
+    {
+        if(!pKiller->Infected() || !pKiller->m_HasSuperJump)
+            pKiller->m_Kills++;
 
-	if (pKiller != pVictim->GetPlayer())
-		pKiller->m_Kills++;
-
-    if (pKiller->Infected()) {
-        if (pKiller->m_Kills >= g_Config.m_InfSuperJumpKills && !pKiller->m_HasSuperJump) {
-            pKiller->m_Kills -= g_Config.m_InfSuperJumpKills;
-            pKiller->m_HasSuperJump = true;
-            GameServer()->SendBroadcast("You earned super jump, hold spacebar to use it", pKiller->GetCID());
-            char str[512] = {0};
-            sprintf(str, g_Config.m_InfSuperJumpText, Server()->ClientName(pKiller->GetCID()));
-            GameServer()->SendChatTarget(-1, str);
-        }
-    } else {
-        if (pKiller->m_Kills >= g_Config.m_InfAirstrikeKills && !pKiller->m_HasAirstrike) {
-            pKiller->m_Kills -= g_Config.m_InfAirstrikeKills;
-            pKiller->m_HasAirstrike = true;
-            GameServer()->SendBroadcast("You got an airstrike, use hammer to launch it :D", pKiller->GetCID());
-            char str[512] = {0};
-            sprintf(str, g_Config.m_InfAirstrikeText, Server()->ClientName(pKiller->GetCID()));
-            GameServer()->SendChatTarget(-1, str);
+        if (pKiller->Infected()) {
+            if (pKiller->m_Kills >= g_Config.m_InfSuperJumpKills && !pKiller->m_HasSuperJump) {
+                pKiller->m_Kills = 0;
+                pKiller->m_HasSuperJump = true;
+                GameServer()->SendBroadcast("You earned super jump, hold spacebar to use it", pKiller->GetCID());
+                char str[512] = {0};
+                sprintf(str, g_Config.m_InfSuperJumpText, Server()->ClientName(pKiller->GetCID()));
+                GameServer()->SendChatTarget(-1, str);
+            }
+        } else {
+            if (pKiller->m_Kills >= g_Config.m_InfAirstrikeKills && !pKiller->m_HasAirstrike) {
+                pKiller->m_Kills -= g_Config.m_InfAirstrikeKills;
+                pKiller->m_HasAirstrike = true;
+                GameServer()->SendBroadcast("You got an airstrike, use hammer to launch it :D", pKiller->GetCID());
+                char str[512] = {0};
+                sprintf(str, g_Config.m_InfAirstrikeText, Server()->ClientName(pKiller->GetCID()));
+                GameServer()->SendChatTarget(-1, str);
+            }
         }
     }
 	return 0;

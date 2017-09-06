@@ -144,13 +144,13 @@ void CPlayer::Snap(int SnappingClient)
 
 	if(!m_IsBot) {
 		StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
-		StrToInts(&pClientInfo->m_Clan0, 3, m_Zombie ? m_Zombie == 1 ? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
+        StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
 		pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : m_TeeInfos.m_SkinName);
 	}
 	else {
 		StrToInts(&pClientInfo->m_Name0, 4, m_pBot->GetName());
-		StrToInts(&pClientInfo->m_Clan0, 3, m_Zombie ? m_Zombie == 1 ? "Zombie" : "iZombie" : m_pBot->GetClan());
+        StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : m_pBot->GetClan());
 		pClientInfo->m_Country = 0;
 		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : g_Config.m_SvBotSkin);
 	}

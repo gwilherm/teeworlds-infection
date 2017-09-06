@@ -26,7 +26,7 @@ public:
 
     void Infect(int By = -1, int Weapon = WEAPON_HAMMER);
     void Cure(int By = -1, int WEAPON = WEAPON_GAME);
-    inline bool Infected() { return (m_Zombie > 0); }
+    inline bool Infected() { return (m_Zombie != HUMAN); }
 
     bool SpawnProtection();
 

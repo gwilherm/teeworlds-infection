@@ -101,7 +101,7 @@ private:
 	int m_DamageTaken;
 
 	int m_EmoteType;
-	int m_EmoteStop;
+    int m_EmoteStop;
 
 	// last tick that the player took any action ie some input
 	int m_LastAction;

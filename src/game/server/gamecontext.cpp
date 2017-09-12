@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
+#include <string.h>
 #include <base/math.h>
 #include <engine/shared/config.h>
 #include <engine/map.h>
@@ -750,25 +751,25 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if (str_comp_nocase_num(pMsg->m_pMessage+1, "w ", 2) == 0)
 				{
 					char pWhisperMsg[256];
-					str_copy(pWhisperMsg, pMsg->m_pMessage + 3, 256);
-					if(!pPlayer->IsMuted())
-						Whisper(pPlayer->GetCID(), pWhisperMsg);
-					else
-						SendChatTarget(ClientID, "You have been muted.");
+                    str_copy(pWhisperMsg, pMsg->m_pMessage + 3, 256);
+                    Whisper(ClientID, pWhisperMsg);
 				}
 				else if (str_comp_nocase_num(pMsg->m_pMessage+1, "whisper ", 8) == 0)
 				{
 					char pWhisperMsg[256];
 					str_copy(pWhisperMsg, pMsg->m_pMessage + 9, 256);
-					if(!pPlayer->IsMuted())
-						Whisper(pPlayer->GetCID(), pWhisperMsg);
-					else
-						SendChatTarget(ClientID, "You have been muted.");
-				}
-				else
-				{
-					SendChatTarget(ClientID, "Unknown command.");
-				}
+                    Whisper(ClientID, pWhisperMsg);
+                }
+                else if(str_comp_nocase_num(pMsg->m_pMessage+1, "emote ", 6) == 0)
+                {
+                    char pEmoteType[256];
+                    str_copy(pEmoteType, pMsg->m_pMessage + 6, 256);
+                    EyeEmote(ClientID, pEmoteType);
+                }
+                else
+                {
+                    SendChatTarget(ClientID, "Unknown command.");
+                }
 			}
 			else
 			{
@@ -2038,6 +2039,13 @@ bool CheckClientID2(int ClientID)
 
 void CGameContext::Whisper(int ClientID, char *pStr)
 {
+    CPlayer *pPlayer = m_apPlayers[ClientID];
+    if(pPlayer->IsMuted())
+    {
+        SendChatTarget(ClientID, "You have been muted.");
+        return;
+    }
+
 	char *pName;
 	char *pMessage;
 	int Error = 0;
@@ -2191,4 +2199,60 @@ void CGameContext::WhisperID(int ClientID, int VictimID, const char *pMessage)
 		str_format(aBuf, sizeof(aBuf), "[← %s] %s", (m_apPlayers[ClientID]->IsBot() && m_apPlayers[ClientID]->m_pBot)? m_apPlayers[ClientID]->m_pBot->GetName() : Server()->ClientName(ClientID), pMessage);
 		SendChatTarget(VictimID, aBuf);
 	}
+}
+
+void CGameContext::EyeEmote(int ClientID, char *args)
+{
+    CPlayer *pPlayer = m_apPlayers[ClientID];
+
+    if(pPlayer)
+    {
+        if(pPlayer->m_LastEyeEmote + g_Config.m_SvEyeEmoteChangeDelay * Server()->TickSpeed() >= Server()->Tick())
+            return;
+
+        char* pEmoteType = strtok(args, " ");
+        if(str_comp_nocase_num(pEmoteType, "surprise", 8) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_SURPRISE;
+        }
+        else if (str_comp_nocase_num(pEmoteType, "normal", 6) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_NORMAL;
+        }
+        else if(str_comp_nocase_num(pEmoteType, "blink", 5) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_BLINK;
+        }
+        else if(str_comp_nocase_num(pEmoteType, "close", 5) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_BLINK;
+        }
+        else if(str_comp_nocase_num(pEmoteType, "angry", 5) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_ANGRY;
+        }
+        else if(str_comp_nocase_num(pEmoteType, "happy", 5) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_HAPPY;
+        }
+        else if(str_comp_nocase_num(pEmoteType, "pain", 4) == 0)
+        {
+            pPlayer->m_DefEmote=EMOTE_PAIN;
+        }
+        else
+        {
+            SendChatTarget(ClientID, "No such emote.");
+            return;
+        }
+    }
+
+    int Duration = 1;
+
+    char* pDurationStr = strtok(NULL, " ");
+    if (pDurationStr != NULL)
+        Duration = atoi(pDurationStr);
+
+    pPlayer->m_DefEmoteReset = Server()->Tick()
+                    + Duration * Server()->TickSpeed();
+    pPlayer->m_LastEyeEmote = Server()->Tick();
 }

@@ -203,6 +203,8 @@ public:
 
 	void Whisper(int ClientID, char *pStr);
 	void WhisperID(int ClientID, int VictimID, const char *pMessage);
+    void EyeEmote(int ClientID, char *args);
+
 };
 
 inline int CmaskAll() { return -1; }

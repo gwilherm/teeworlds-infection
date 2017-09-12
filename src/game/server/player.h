@@ -127,6 +127,10 @@ public:
     bool m_HasSuperJump;
     bool m_HasAirstrike;
 
+    int m_LastEyeEmote;
+    int m_DefEmote;
+    int m_DefEmoteReset;
+
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

@@ -156,7 +156,7 @@ void CPlayer::Snap(int SnappingClient)
 	}
 
 	pClientInfo->m_UseCustomColor = m_Zombie ? true : false;
-	pClientInfo->m_ColorBody = m_Zombie ? 3920896 : m_TeeInfos.m_ColorBody;
+	pClientInfo->m_ColorBody = m_Zombie ? g_Config.m_InfZombieBodyColor : m_TeeInfos.m_ColorBody;
 	pClientInfo->m_ColorFeet = m_TeeInfos.m_ColorFeet;
 
 	CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, m_ClientID, sizeof(CNetObj_PlayerInfo)));

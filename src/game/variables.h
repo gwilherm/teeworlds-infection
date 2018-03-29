@@ -100,6 +100,8 @@ MACRO_CONFIG_INT(InfAllowZombieSelfkill, inf_allow_zombie_selfkill, 1, 0, 1, CFG
 
 MACRO_CONFIG_INT(SvShotgunForce, sv_shotgun_force, 0, 0, 256, CFGFLAG_SERVER, "Shotgun force")
 MACRO_CONFIG_INT(SvAllowFriendlyShotgun, sv_allow_friendly_shotgun, 0, 0, 1, CFGFLAG_SERVER, "Allow humans to blow each other away with the shotgun")
+MACRO_CONFIG_INT(InfZombieBodyColor, inf_zombie_body_color, 3920896, 0, 16777215, CFGFLAG_SERVER, "Zombie body color, default is 3920896.")
+
 
 MACRO_CONFIG_INT(SvPunishTime, sv_punish_time, 3, 0, 0, CFGFLAG_SERVER, "The time while player could be in 'punished' mode(in seconds)")
 MACRO_CONFIG_INT(SvTkPenalty, sv_teamkill_penalty, 2, 0, 10, CFGFLAG_SERVER, "The amount of point to decrease teamkiller's score")

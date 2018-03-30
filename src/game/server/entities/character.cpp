@@ -318,6 +318,11 @@ void CCharacter::FireWeapon()
                     m_pPlayer->m_HasAirstrike = false;
                     break;
                 }
+				if (m_pPlayer->m_HasFirework) {
+					GameServer()->CreateFirework(m_Pos, m_pPlayer->GetCID(), ProjStartPos, Direction);
+					m_pPlayer->m_HasFirework = false;
+					break;
+				}
                 if (m_pWall || m_WallStart == vec2(0, 0)) {
 					ResetWall();
                     m_WallStart = m_Pos;

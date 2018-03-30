@@ -270,6 +270,46 @@ void CGameContext::CreateAirstrike(vec2 Pos, int Owner) {
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
 
+void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 Direction) {
+	m_AmountOfFireworks = g_Config.m_InfAmountOfFireworks;	
+			
+	CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
+		Owner,
+		ProjStartPos,
+		Direction,	
+		(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
+		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
+
+	pProj->Firework();
+
+    CreateSound(Pos, SOUND_GRENADE_FIRE);
+}
+
+void CGameContext::doCreateFirework(int Owner, vec2 CurPos) {
+
+	int Tuning2 = (int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime);
+	float RocketAmount = 0.77;
+	
+	for (float i=-1; i<=1;i=i+(RocketAmount)){
+		for (float j=-1; j<=1;j=j+(RocketAmount)){			
+			vec2 Posi = CurPos;
+			Posi.x = Posi.x+i*10;
+			Posi.y = Posi.y+j*10;
+			vec2 Direction = vec2(i, j);
+			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2 ,1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
+			if (m_AmountOfFireworks > 0)
+			{
+				pProj1->Firework();					
+			}
+		}
+	}
+
+	if (m_AmountOfFireworks > 0)
+	{
+		m_AmountOfFireworks--;
+	}		
+}
+
 void CGameContext::SendChatTarget(int To, const char *pText)
 {
 	CNetMsg_Sv_Chat Msg;
@@ -1646,6 +1686,16 @@ void CGameContext::ConAirstrike(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->m_HasAirstrike = true;
 }
 
+void CGameContext::ConFirework(IConsole::IResult *pResult, void *pUserData) {
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
+
+    if (!pSelf->m_apPlayers[ClientID])
+        return;
+
+    pSelf->m_apPlayers[ClientID]->m_HasFirework = true;
+}
+
 void CGameContext::ConSuperJump(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
@@ -1785,6 +1835,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("cure", "i", CFGFLAG_SERVER, ConCure, this, "Cure someone");
 	Console()->Register("izombie", "i", CFGFLAG_SERVER, ConIZombie, this, "Turn someone into an iZombie");
 	Console()->Register("airstrike", "i", CFGFLAG_SERVER, ConAirstrike, this, "Give airstrike to a player");
+	Console()->Register("firework", "i", CFGFLAG_SERVER, ConFirework, this, "Give firework to a player");
 	Console()->Register("superjump", "i", CFGFLAG_SERVER, ConSuperJump, this, "Give superjump to a zombie");
 
 	Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute player");

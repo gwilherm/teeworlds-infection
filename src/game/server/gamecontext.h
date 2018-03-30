@@ -69,6 +69,7 @@ class CGameContext : public IGameServer
 	static void ConCure(IConsole::IResult *pResult, void *pUserData);
 	static void ConIZombie(IConsole::IResult *pResult, void *pUserData);
 	static void ConAirstrike(IConsole::IResult *pResult, void *pUserData);
+	static void ConFirework(IConsole::IResult *pResult, void *pUserData);
 	static void ConSuperJump(IConsole::IResult *pResult, void *pUserData);
 
 	static void ConMute(IConsole::IResult *pResult, void *pUserData);
@@ -105,6 +106,7 @@ public:
 	class CCharacter *GetPlayerChar(int ClientID);
 
 	int m_LockTeams;
+	int m_AmountOfFireworks;
 
 	// voting
 	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
@@ -142,6 +144,8 @@ public:
 	void CreateSound(vec2 Pos, int Sound, int Mask=-1);
 	void CreateSoundGlobal(int Sound, int Target=-1);
     void CreateAirstrike(vec2 Pos, int Owner);
+	void doCreateFirework(int Owner, vec2 CurPos);
+    void CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 Direction);
 
 	enum
 	{

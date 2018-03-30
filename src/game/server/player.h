@@ -124,8 +124,10 @@ public:
     };
     int m_Zombie;
     int m_Kills;
+	bool m_AirstrikeNotFirework;
     bool m_HasSuperJump;
     bool m_HasAirstrike;
+	bool m_HasFirework;
 
     int m_LastEyeEmote;
     int m_DefEmote;

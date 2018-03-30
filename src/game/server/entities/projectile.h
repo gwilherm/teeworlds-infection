@@ -11,6 +11,7 @@ public:
 
 	vec2 GetPos(float Time);
 	void FillInfo(CNetObj_Projectile *pProj);
+	void Firework();
 
 	virtual void Reset();
 	virtual void Tick();
@@ -28,6 +29,7 @@ private:
 	float m_Force;
 	int m_StartTick;
 	bool m_Explosive;
+	bool m_Firework;
 };
 
 #endif

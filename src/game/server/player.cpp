@@ -29,8 +29,10 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 		m_Zombie = ZOMBIE;
 
 	m_Kills = 0;
+	m_AirstrikeNotFirework = true;
 	m_HasSuperJump = false;
 	m_HasAirstrike = false;
+	m_HasFirework = false;
 
 	m_IsBot = false;
 
@@ -331,6 +333,7 @@ void CPlayer::Infect(int By, int Weapon) {
     {
         m_Zombie = ZOMBIE;
         m_Kills = 0;
+		m_AirstrikeNotFirework = true;
         return;
     }
 
@@ -353,6 +356,7 @@ void CPlayer::Infect(int By, int Weapon) {
 	if(IsBot() && m_pBot)
 		m_pBot->OnReset();
 
+	m_AirstrikeNotFirework = true;
 }
 
 void CPlayer::Cure(int By, int Weapon) {
@@ -361,6 +365,7 @@ void CPlayer::Cure(int By, int Weapon) {
 
     m_Zombie = HUMAN;
     m_Kills = 0;
+    m_AirstrikeNotFirework = true;
 
     if (m_pCharacter) {
         m_pCharacter->GiveWeapon(WEAPON_HAMMER, -1);

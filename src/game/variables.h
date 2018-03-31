@@ -88,8 +88,8 @@ MACRO_CONFIG_INT(InfWallDelay, inf_walldelay, 1, 0, 0, CFGFLAG_SERVER, "Time bef
 MACRO_CONFIG_INT(InfWallLife, inf_walllife, 30, 0, 0, CFGFLAG_SERVER, "Time wall stays(in seconds)")
 MACRO_CONFIG_INT(InfWallLength, inf_walllength, 256, 0, 0, CFGFLAG_SERVER, "Length of a wall(in pixels)")
 MACRO_CONFIG_INT(InfInfectionDelay, inf_infectiondelay, 10, 0, 0, CFGFLAG_SERVER, "Delay before the IZombie gets chosen.")
-MACRO_CONFIG_INT(InfAirstrikeKills, inf_airstrikekills, 5, 0, 0, CFGFLAG_SERVER, "Kills needed for an airstrike.")
-MACRO_CONFIG_INT(InfFireworkKills, inf_fireworkkills, 5, 0, 0, CFGFLAG_SERVER, "Kills needed for an firework.")
+MACRO_CONFIG_INT(InfAirstrikeKills, inf_airstrikekills, 5, 0, 0, CFGFLAG_SERVER, "Kills needed for an airstrike (0 = disable airstrike).")
+MACRO_CONFIG_INT(InfFireworkKills, inf_fireworkkills, 0, 0, 0, CFGFLAG_SERVER, "Kills needed for an firework (0 = disable firework).")
 MACRO_CONFIG_INT(InfSuperJumpKills, inf_superjumpkills, 2, 0, 0, CFGFLAG_SERVER, "Kills needed for superjump.")
 MACRO_CONFIG_INT(InfSuperJumpForce, inf_superjumpforce, 40, 0, 0, CFGFLAG_SERVER, "Strength of superjump.")
 MACRO_CONFIG_INT(InfZombieExplodes, inf_zombie_explodes, 1, 0, 2, CFGFLAG_SERVER, "Zombies explode. (0 = off, 1 = IZombie, 2 = All Zombies)")
@@ -99,7 +99,7 @@ MACRO_CONFIG_STR(InfSuperJumpText, inf_superjump_text, 512, "%s mutated and can 
 MACRO_CONFIG_INT(InfAirstrikeType, inf_airstrike_type, 0, 0, 1, CFGFLAG_SERVER, "Airstrike type (0 = standard, 1 = V")
 MACRO_CONFIG_INT(InfSafeSpawnDelay, inf_safespawndelay, 0, 0, 5, CFGFLAG_SERVER, "Delay of spawn protection(in seconds)")
 MACRO_CONFIG_INT(InfAllowZombieSelfkill, inf_allow_zombie_selfkill, 1, 0, 1, CFGFLAG_SERVER, "Allow zombies to infect by selfkill.")
-MACRO_CONFIG_INT(InfAmountOfFireworks, inf_firework_type, 1, 0, 1, CFGFLAG_SERVER, "Firework type (0 = small, 1 = bigone!)")
+MACRO_CONFIG_INT(InfAmountOfFireworks, inf_firework_type, 0, 0, 1, CFGFLAG_SERVER, "Firework type (0 = small, 1 = bigone!)")
 
 //Server Bots
 MACRO_CONFIG_INT(SvBotSlots, sv_bot_slots, 2, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Number of slots to reserve for bots")

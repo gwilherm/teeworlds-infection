@@ -98,14 +98,33 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
                 GameServer()->SendChatTarget(-1, str);
             }
         } else {
-            if (pKiller->m_Kills >= g_Config.m_InfAirstrikeKills && !pKiller->m_HasAirstrike) {
-                pKiller->m_Kills -= g_Config.m_InfAirstrikeKills;
-                pKiller->m_HasAirstrike = true;
-                GameServer()->SendBroadcast("You got an airstrike, use hammer to launch it :D", pKiller->GetCID());
-                char str[512] = {0};
-                sprintf(str, g_Config.m_InfAirstrikeText, Server()->ClientName(pKiller->GetCID()));
-                GameServer()->SendChatTarget(-1, str);
-            }
+			if (pKiller->m_AirstrikeNotFirework || g_Config.m_InfFireworkKills == 0) {
+				if (pKiller->m_Kills >= g_Config.m_InfAirstrikeKills && !pKiller->m_HasAirstrike) {
+					if (g_Config.m_InfAirstrikeKills != 0){
+						pKiller->m_Kills -= g_Config.m_InfAirstrikeKills;
+						pKiller->m_HasAirstrike = true;
+						GameServer()->SendBroadcast("You got an airstrike, use hammer to launch it :D", pKiller->GetCID());
+						char str[512] = {0};
+						sprintf(str, g_Config.m_InfAirstrikeText, Server()->ClientName(pKiller->GetCID()));
+						GameServer()->SendChatTarget(-1, str);
+					}
+					
+					pKiller->m_AirstrikeNotFirework = false;
+				}
+			} else {
+				if (pKiller->m_Kills >= g_Config.m_InfFireworkKills && !pKiller->m_HasFirework) {
+					if (g_Config.m_InfFireworkKills != 0){
+						pKiller->m_Kills -= g_Config.m_InfFireworkKills;
+						pKiller->m_HasFirework = true;
+						GameServer()->SendBroadcast("You got a firework, use hammer to launch it ^^", pKiller->GetCID());
+						char str[512] = {0};
+						sprintf(str, g_Config.m_InfFireworkText, Server()->ClientName(pKiller->GetCID()));
+						GameServer()->SendChatTarget(-1, str);
+					}
+					
+					pKiller->m_AirstrikeNotFirework = true;
+				}
+			}
         }
     }
 	return 0;
@@ -121,6 +140,7 @@ void CGameControllerInfection::PostReset()
 			GameServer()->m_apPlayers[i]->m_Kills = 0;
 			GameServer()->m_apPlayers[i]->m_HasSuperJump = false;
 			GameServer()->m_apPlayers[i]->m_HasAirstrike = false;
+			GameServer()->m_apPlayers[i]->m_HasFirework = false;
 			GameServer()->m_apPlayers[i]->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
 		}
 	}

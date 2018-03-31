@@ -270,7 +270,8 @@ void CGameContext::CreateAirstrike(vec2 Pos, int Owner) {
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
 
-void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 Direction) {
+void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 Direction)
+{
 	m_AmountOfFireworks = g_Config.m_InfAmountOfFireworks;	
 			
 	CProjectile *pProj = new CProjectile(&m_World, WEAPON_GRENADE,
@@ -278,9 +279,7 @@ void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 D
 		ProjStartPos,
 		Direction,	
 		(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
-		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
-
-	pProj->Firework();
+		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, true);
 
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
@@ -290,17 +289,16 @@ void CGameContext::doCreateFirework(int Owner, vec2 CurPos) {
 	int Tuning2 = (int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime);
 	float RocketAmount = 0.77;
 	
-	for (float i=-1; i<=1;i=i+(RocketAmount)){
-		for (float j=-1; j<=1;j=j+(RocketAmount)){			
+	for (float i = -1; i <= 1; i += RocketAmount)
+	{
+		for (float j = -1; j <= 1; j += RocketAmount)
+		{
 			vec2 Posi = CurPos;
-			Posi.x = Posi.x+i*10;
-			Posi.y = Posi.y+j*10;
+			Posi.x = Posi.x + i*10;
+			Posi.y = Posi.y + j*10;
 			vec2 Direction = vec2(i, j);
-			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2 ,1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
-			if (m_AmountOfFireworks > 0)
-			{
-				pProj1->Firework();					
-			}
+			bool isFirework = (m_AmountOfFireworks > 0);
+			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2, 1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, isFirework);
 		}
 	}
 

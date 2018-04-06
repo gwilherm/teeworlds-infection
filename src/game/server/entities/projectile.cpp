@@ -73,11 +73,16 @@ void CProjectile::Tick()
 			GameServer()->CreateSound(CurPos, m_SoundImpact);
 
 		if(m_Explosive){
-			GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, 	2);
-			if (m_Firework>1){
+			if (m_Firework > 1){
+				GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, m_Firework);
 				GameServer()->doCreateFirework(m_Owner, CurPos);
 				m_Firework = 1;
 			}
+			else if (m_Firework > 0 ){
+				GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, m_Firework);
+				m_Firework = 0;
+			}
+			else GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, m_Firework);
 		}
 		
 		else if(TargetChr)

@@ -879,6 +879,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Firew
 	}
 	else if(!GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
 	{
+		if (From == m_pPlayer->GetCID() && Firework)
+			Dmg = 0;
 		if(Dmg)
 		{
 			if(m_Armor)
@@ -899,10 +901,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Firew
 					m_Armor -= Dmg;
 					Dmg = 0;
 				}
-			}
-			if (From == m_pPlayer->GetCID() && Firework)
-			{		
-			Dmg = 0;
 			}
 			m_Health -= Dmg;
 		}

@@ -5,7 +5,7 @@
 #include "projectile.h"
 
 CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
-		int Damage, bool Explosive, float Force, int SoundImpact, int Weapon, bool Firework, bool Firework2)
+		int Damage, bool Explosive, float Force, int SoundImpact, int Weapon, int Firework)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PROJECTILE)
 {
 	m_Type = Type;
@@ -20,7 +20,6 @@ CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, 
 	m_StartTick = Server()->Tick();
 	m_Explosive = Explosive;
 	m_Firework = Firework;
-	m_Firework2 = Firework2;
 	
 	GameWorld()->InsertEntity(this);
 }
@@ -74,10 +73,10 @@ void CProjectile::Tick()
 			GameServer()->CreateSound(CurPos, m_SoundImpact);
 
 		if(m_Explosive){
-			GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, m_Firework2);
-			if (m_Firework){
+			GameServer()->CreateExplosion(CurPos, m_Owner, m_Weapon, false, 2, 	2);
+			if (m_Firework>1){
 				GameServer()->doCreateFirework(m_Owner, CurPos);
-				m_Firework = false;
+				m_Firework = 1;
 			}
 		}
 		

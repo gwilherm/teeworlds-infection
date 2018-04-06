@@ -279,7 +279,7 @@ void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 D
 		ProjStartPos,
 		Direction,	
 		(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
-		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, true, true);
+		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, 2);
 
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
@@ -297,8 +297,8 @@ void CGameContext::doCreateFirework(int Owner, vec2 CurPos) {
 			Posi.x = Posi.x + i*10;
 			Posi.y = Posi.y + j*10;
 			vec2 Direction = vec2(i, j);
-			bool isFirework = (m_AmountOfFireworks > 0);
-			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2, 1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, isFirework, true);
+			int isFirework = (m_AmountOfFireworks > 0) ? 2 : 1;
+			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2, 1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, isFirework);
 		}
 	}
 

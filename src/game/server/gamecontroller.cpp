@@ -299,6 +299,11 @@ int IGameController::PickZombie() {
     return -1;
 }
 
+const int* IGameController::GetIdArray() const
+{
+	return m_aIdArray;
+}
+
 void IGameController::CycleMap()
 {
 	if(m_aMapWish[0] != 0)

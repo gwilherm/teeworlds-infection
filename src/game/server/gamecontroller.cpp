@@ -254,14 +254,17 @@ void IGameController::GenerateSetOfNumbers() {
     for (int i = 0; i < MAX_CLIENTS; i++)
         tempArray[i] = i;
 
-    for (int i = MAX_CLIENTS; i > 0; i--)
-    {
-        int j = rand()%i;
-        int temp = tempArray[i-1];
-        tempArray[i-1] = tempArray[j];
-        tempArray[j] = temp;
-    }
-    
+	if(g_Config.m_InfRandomIZombiePicking)
+	{
+		for (int i = MAX_CLIENTS; i > 0; i--)
+		{
+			int j = rand()%i;
+			int temp = tempArray[i-1];
+			tempArray[i-1] = tempArray[j];
+			tempArray[j] = temp;
+		}
+	}
+
     std::memcpy(m_aIdArray, tempArray, MAX_CLIENTS*sizeof(int));
 }
 

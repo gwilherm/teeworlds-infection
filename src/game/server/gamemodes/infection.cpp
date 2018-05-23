@@ -11,7 +11,7 @@ CGameControllerInfection::CGameControllerInfection(class CGameContext *pGameServ
 : IGameController(pGameServer) {
 	m_pGameType = "Infection+";
 	m_BroadcastTime = 0;
-	m_NextZombie = 0;
+	m_NextIdToPick = 0;
 }
 
 void CGameControllerInfection::DoWincheck() {

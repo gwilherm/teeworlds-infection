@@ -4,6 +4,7 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
+#include <engine/shared/protocol.h>
 
 /*
 	Class: Game Controller
@@ -17,6 +18,10 @@ class IGameController
 
 	class CGameContext *m_pGameServer;
 	class IServer *m_pServer;
+	
+private:
+	void GenerateSetOfNumbers();
+	int m_aIdArray[MAX_CLIENTS];
 
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
@@ -59,8 +64,8 @@ protected:
 	int m_GameFlags;
 	int m_UnbalancedTick;
 	bool m_ForceBalanced;
-	
-	int m_NextZombie;
+
+	int m_NextIdToPick;
 	int m_ZombieSpawnTick;
 
 public:

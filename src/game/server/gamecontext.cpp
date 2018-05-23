@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 #include <string.h>
+#include <sstream>
 #include <base/math.h>
 #include <engine/shared/config.h>
 #include <engine/map.h>
@@ -1674,6 +1675,23 @@ void CGameContext::ConIZombie(IConsole::IResult *pResult, void *pUserData) {
     pSelf->m_apPlayers[ClientID]->m_Zombie = CPlayer::I_ZOMBIE;
 }
 
+void CGameContext::ConIZombieOrder(IConsole::IResult *pResult, void *pUserData) {
+	std::ostringstream aBuf;
+
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	const int* izOrder = pSelf->m_pController->GetIdArray();
+
+	aBuf << "Current iZombie order is: ";
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		aBuf << izOrder[i] << " ";
+	}
+
+	pSelf->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf.str().c_str());
+}
+
 void CGameContext::ConAirstrike(IConsole::IResult *pResult, void *pUserData) {
     CGameContext *pSelf = (CGameContext *)pUserData;
     int ClientID = clamp(pResult->GetInteger(0), 0, MAX_CLIENTS - 1);
@@ -1832,6 +1850,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("zombie", "i", CFGFLAG_SERVER, ConZombie, this, "Turn someone into a zombie");
 	Console()->Register("cure", "i", CFGFLAG_SERVER, ConCure, this, "Cure someone");
 	Console()->Register("izombie", "i", CFGFLAG_SERVER, ConIZombie, this, "Turn someone into an iZombie");
+	Console()->Register("izombie_order", "", CFGFLAG_SERVER, ConIZombieOrder, this, "Print current iZombie order");
 	Console()->Register("airstrike", "i", CFGFLAG_SERVER, ConAirstrike, this, "Give airstrike to a player");
 	Console()->Register("firework", "i", CFGFLAG_SERVER, ConFirework, this, "Give firework to a player");
 	Console()->Register("superjump", "i", CFGFLAG_SERVER, ConSuperJump, this, "Give superjump to a zombie");

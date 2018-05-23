@@ -93,6 +93,7 @@ public:
 
 	bool IsForceBalanced();
 
+	const int* GetIdArray() const;
 	/*
 
 	*/

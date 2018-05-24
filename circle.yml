@@ -1,0 +1,25 @@
+dependencies:
+  pre:
+    - |
+	sudo add-apt-repository 'deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu trusty main restricted universe multiverse'
+	sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
+	sudo apt-get update
+	sudo apt-get install libsdl2-dev
+
+	if [ ! -d ~/bam-0.4.0 ]; then
+		pushd ~
+		wget http://github.com/downloads/matricks/bam/bam-0.4.0.tar.gz
+		tar xvzf bam-0.4.0.tar.gz
+		cd bam-0.4.0
+		./make_unix.sh
+		popd
+        fi
+
+  cache_directories:
+    - "~/bam-0.4.0/"
+
+test:
+  override:
+    - |
+	~/bam-0.4.0/bam server_release
+	~/bam-0.4.0/bam server_debug

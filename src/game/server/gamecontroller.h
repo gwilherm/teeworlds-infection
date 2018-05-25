@@ -65,6 +65,7 @@ protected:
 	int m_UnbalancedTick;
 	bool m_ForceBalanced;
 
+	int m_currentIZombie;
 	int m_NextIdToPick;
 	int m_ZombieSpawnTick;
 
@@ -95,6 +96,7 @@ public:
 	bool IsForceBalanced();
 
 	const int* GetIdArray() const;
+	const int  GetCurrentIZombie() const;
 	/*
 
 	*/

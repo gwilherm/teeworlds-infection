@@ -1,3 +1,30 @@
+target_family = os.getenv("TARGET_FAMILY")
+if target_family then
+	family = target_family
+else
+--	print("Auto family: " .. family)
+end
+
+target_platform = os.getenv("TARGET_PLATFORM")
+if target_platform then
+	platform = target_platform
+else
+--	print("Auto platform: " .. platform)
+end
+
+target_arch = os.getenv("TARGET_ARCH")
+if target_arch then
+	arch = target_arch
+else
+--	print("Auto arch: " .. arch)
+end
+
+if family == "windows" then
+	sysconf = target_platform or platform
+else
+	sysconf = (target_platform or platform) .. "-" .. (target_arch or arch)  --family .. "-" .. platform .. "-" .. arch
+end
+
 CheckVersion("0.4")
 
 Import("configure.lua")
@@ -53,13 +80,18 @@ DuplicateDirectoryStructure("src", "src", "objs")
 ]]
 
 function ResCompile(scriptfile)
+	windres = os.getenv("WINDRES")
+	if not windres then
+		windres = "windres"
+	end
+
 	scriptfile = Path(scriptfile)
 	if config.compiler.driver == "cl" then
 		output = PathBase(scriptfile) .. ".res"
 		AddJob(output, "rc " .. scriptfile, "rc /fo " .. output .. " " .. scriptfile)
 	elseif config.compiler.driver == "gcc" then
 		output = PathBase(scriptfile) .. ".coff"
-		AddJob(output, "windres " .. scriptfile, "windres -i " .. scriptfile .. " -o " .. output)
+		AddJob(output, windres .. " " .. scriptfile, windres .. " -i " .. scriptfile .. " -o " .. output)
 	end
 	AddDependency(output, scriptfile)
 	return output
@@ -113,11 +145,13 @@ server_link_other = {}
 
 if family == "windows" then
 	if platform == "win32" then
-		table.insert(client_depends, CopyToDirectory(".", "other\\freetype\\lib32\\freetype.dll"))
-		table.insert(client_depends, CopyToDirectory(".", "other\\sdl\\lib32\\SDL.dll"))
+		table.insert(client_depends, CopyToDirectory(".", "other/freetype/lib32/freetype.dll"))
+		table.insert(client_depends, CopyToDirectory(".", "other/sdl/lib32/SDL.dll"))
+
 	else
-		table.insert(client_depends, CopyToDirectory(".", "other\\freetype\\lib64\\freetype.dll"))
-		table.insert(client_depends, CopyToDirectory(".", "other\\sdl\\lib64\\SDL.dll"))
+		table.insert(client_depends, CopyToDirectory(".", "other/freetype/lib64/freetype.dll"))
+		table.insert(client_depends, CopyToDirectory(".", "other/sdl/lib64/SDL.dll"))
+
 	end
 
 	if config.compiler.driver == "cl" then
@@ -140,11 +174,33 @@ function build(settings)
 	--settings.objdir = Path("objs")
 	settings.cc.Output = Intermediate_Output
 
+	cc = os.getenv("CC")
+	if cc then
+		settings.cc.exe_c = cc
+	end
+	cxx = os.getenv("CXX")
+	if cxx then
+		settings.cc.exe_cxx = cxx
+		settings.link.exe = cxx
+		settings.dll.exe = cxx
+	end
+	cflags = os.getenv("CFLAGS")
+	if cflags then
+		settings.cc.flags:Add(cflags)
+	end
+	ldflags = os.getenv("LDFLAGS")
+	if ldflags then
+		settings.link.flags:Add(ldflags)
+end
 	if config.compiler.driver == "cl" then
 		settings.cc.flags:Add("/wd4244")
 	else
 		settings.cc.flags:Add("-Wall", "--std=gnu++11")
 		if family == "windows" then
+			if config.compiler.driver == "gcc" then
+				settings.link.flags:Add("-static-libgcc")
+				settings.link.flags:Add("-static-libstdc++")
+			end
 			-- disable visibility attribute support for gcc on windows
 			settings.cc.defines:Add("NO_VIZ")
 		elseif platform == "macosx" then

@@ -88,4 +88,4 @@ test:
           mv DLLs.zip $CIRCLE_ARTIFACTS/$DST;
         fi
       :
-    parallel: true
+        parallel: true

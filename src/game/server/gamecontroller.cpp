@@ -37,6 +37,7 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
 
+	m_currentIZombie = 0;
 	m_NextIdToPick = 0;
 	GenerateSetOfNumbers();
 }
@@ -304,6 +305,11 @@ const int* IGameController::GetIdArray() const
 	return m_aIdArray;
 }
 
+const int IGameController::GetCurrentIZombie() const
+{
+	return m_currentIZombie;
+}
+
 void IGameController::CycleMap()
 {
 	if(m_aMapWish[0] != 0)
@@ -477,7 +483,7 @@ void IGameController::Tick()
 	{
 		m_Warmup--;
 		if(!m_Warmup)
-			PickZombie();
+			m_currentIZombie = PickZombie();
 	}
 
 	if(m_GameOverTick != -1)

@@ -1680,13 +1680,15 @@ void CGameContext::ConIZombieOrder(IConsole::IResult *pResult, void *pUserData) 
 
 	CGameContext *pSelf = (CGameContext *)pUserData;
 
-	const int* izOrder = pSelf->m_pController->GetIdArray();
+	const int* izOrder  = pSelf->m_pController->GetIdArray();
+	const int currentId = pSelf->m_pController->GetCurrentIZombie();
 
 	aBuf << "Current iZombie order is: ";
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		aBuf << izOrder[i] << " ";
+		bool isCurrent = (izOrder[i] == currentId);
+		aBuf << (isCurrent? "[":"") << izOrder[i] << (isCurrent? "] ":" ");
 	}
 
 	pSelf->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf.str().c_str());

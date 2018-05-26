@@ -66,7 +66,7 @@ test:
           g++ --version
         fi;
 
-        
+        BIN=infection_srv;
         DST=linux;
         if [ $CIRCLE_NODE_INDEX -eq 1 ]; then
           DST=win64
@@ -81,11 +81,6 @@ test:
         if [ ! $RETVAL -eq 0 ]; then
           exit $RETVAL
         fi;
-        mv "./infection_srv"$EXT $CIRCLE_ARTIFACTS/$DST;
-
-        if [ ! $CIRCLE_NODE_INDEX -eq 0 ]; then
-          zip -q -T -X DLLs . *.dll;
-          mv DLLs.zip $CIRCLE_ARTIFACTS/$DST;
-        fi
+        mv ./${BIN} ${CIRCLE_ARTIFACTS}/${DST}/${BIN}${EXT};
       :
         parallel: true

@@ -12,13 +12,6 @@ dependencies:
           sudo apt-get install mingw-w64 mingw-w64-common
           sudo apt-get install mingw-w64-i686-dev mingw-w64-x86-64-dev
           sudo apt-get install gcc-mingw-w64-base gcc-mingw-w64 g++-mingw-w64
-        else
-          sudo add-apt-repository 'deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu xenial main restricted universe multiverse'
-          sudo add-apt-repository 'deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu xenial-backports main restricted universe multiverse'
-          sudo apt update; sudo apt install gcc
-          sudo add-apt-repository 'deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu artful main restricted universe multiverse'
-          sudo apt update
-          sudo apt install gcc g\+\+
         fi
 
         if [ ! -d ~/bam-0.4.0 ]; then

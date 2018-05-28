@@ -769,7 +769,24 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
                     str_copy(pEmoteType, pMsg->m_pMessage + 6, 256);
                     EyeEmote(ClientID, pEmoteType);
                 }
-                else
+				if(g_Config.m_SvDatabase){
+					if (str_comp_nocase_num(pMsg->m_pMessage+1, "rank ", 5) == 0)
+					{
+						char pRankMsg[256];
+						str_copy(pRankMsg, pMsg->m_pMessage + 6, 256);
+						m_pController->Database->PlayerStats(Server()->ClientName(ClientID), pRankMsg);
+					}
+					else if (str_comp_nocase_num(pMsg->m_pMessage+1, "top5 ", 5) == 0)
+					{
+						char pTop5Msg[256];
+						str_copy(pTop5Msg, pMsg->m_pMessage + 6, 256);
+						if(pTop5Msg[0] == 'r' || pTop5Msg[0] == 'k' || pTop5Msg[0] == 'z')
+							m_pController->Database->Top5(Server()->ClientName(ClientID), pTop5Msg);
+						else
+							SendChatTarget(ClientID, "hint: use /top5 runners or killers or zombies");
+					}
+				}
+				else
                 {
                     SendChatTarget(ClientID, "Unknown command.");
                 }

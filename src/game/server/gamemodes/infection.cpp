@@ -77,6 +77,10 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
             // normal kill
             pKiller->m_Score++;
         }
+		pKiller->m_Statistics.m_RoundKills++;
+		if(pKiller->Infected())
+			pKiller->m_Statistics.m_RoundKillsAsZombie++;
+		pVictim->GetPlayer()->m_Statistics.m_RoundDeath++;
 	}
 
 	if (Weapon == WEAPON_SELF)

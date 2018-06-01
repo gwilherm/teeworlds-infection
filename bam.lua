@@ -225,6 +225,7 @@ end
 			settings.link.frameworks:Add("AppKit")
 		else
 			settings.link.libs:Add("pthread")
+			settings.link.libs:Add("dl") -- for sqlite
 		end
 		
 		if platform == "solaris" then
@@ -250,6 +251,9 @@ end
 		zlib = Compile(settings, Collect("src/engine/external/zlib/*.c"))
 		settings.cc.includes:Add("src/engine/external/zlib")
 	end
+	
+	-- build sqlite
+	sqlite = Compile(settings, Collect("src/engine/external/sqlite/sqlite3.c"))
 
 	-- build the small libraries
 	wavpack = Compile(settings, Collect("src/engine/external/wavpack/*.c"))
@@ -319,7 +323,7 @@ end
 		client_link_other, client_osxlaunch)
 
 	server_exe = Link(server_settings, "infection_srv", engine, server,
-		game_shared, game_server, zlib, md5, server_link_other)
+		game_shared, game_server, zlib, md5, sqlite, server_link_other)
 
 	serverlaunch = {}
 	if platform == "macosx" then

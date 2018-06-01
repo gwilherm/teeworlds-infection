@@ -3,6 +3,10 @@
 #ifndef GAME_SERVER_GAMECONTROLLER_H
 #define GAME_SERVER_GAMECONTROLLER_H
 
+#include <map>
+#include <string>
+#include "database.h"
+
 #include <base/vmath.h>
 #include <engine/shared/protocol.h>
 
@@ -22,6 +26,11 @@ class IGameController
 private:
 	void GenerateSetOfNumbers();
 	int m_aIdArray[MAX_CLIENTS];
+	
+	std::map<int,std::string> m_mapStatsPlayers;
+	void StartStats();
+	void TickStats();
+	void StopStats();
 
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
@@ -70,6 +79,8 @@ protected:
 	int m_ZombieSpawnTick;
 
 public:
+	CDatabase *Database;
+
 	const char *m_pGameType;
 
 	bool IsTeamplay() const;

@@ -596,6 +596,7 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
+	m_pPlayer->m_Statistics.m_Pos = m_Pos;
 	if(m_pPlayer->m_ForceBalanced)
 	{
 		char Buf[128];

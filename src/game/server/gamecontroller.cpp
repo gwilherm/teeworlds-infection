@@ -12,7 +12,6 @@
 #include <cstring>
 #include <time.h>
 
-
 IGameController::IGameController(class CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
@@ -40,6 +39,8 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_currentIZombie = 0;
 	m_NextIdToPick = 0;
 	GenerateSetOfNumbers();
+	
+	Database = new CDatabase(GameServer()->Console());
 }
 
 IGameController::~IGameController()
@@ -186,6 +187,27 @@ void IGameController::EndRound()
 	GameServer()->m_World.m_Paused = true;
 	m_GameOverTick = Server()->Tick();
 	m_SuddenDeath = 0;
+	
+	//stats
+	int Zombies = 0;
+	for (int i = 0; i < MAX_CLIENTS; i ++) {
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+		if (pPlayer->Infected())
+		{
+			Zombies++;
+		}
+	}
+	for (int i = 0; i < MAX_CLIENTS; i ++) {
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+		if (!pPlayer->Infected() && Zombies > 2)
+			pPlayer->m_Statistics.m_WonRoundAsHuman = true;
+
+	}
+	StopStats();		
 }
 
 void IGameController::ResetGame()
@@ -232,12 +254,88 @@ void IGameController::StartRound()
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
 	CureAll();
+	StartStats();
 }
 
 void IGameController::ChangeMap(const char *pToMap)
 {
 	str_copy(m_aMapWish, pToMap, sizeof(m_aMapWish));
 	EndRound();
+}
+
+void IGameController::StartStats() 
+{
+	if(g_Config.m_SvDatabase){
+		Database->NewRound();
+		for (int i = 0; i < MAX_CLIENTS; i ++) {
+			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+				continue;
+			m_mapStatsPlayers[i]=Server()->ClientName(i);
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundTimeInGame = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_WonRoundAsHuman = false;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundScore = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundDeath = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_Distance = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_OldPos = GameServer()->m_apPlayers[i]->m_Statistics.m_Pos;
+		}
+	}
+}
+
+void IGameController::TickStats()
+{	
+	if(g_Config.m_SvDatabase){
+		for (int i = 0; i < MAX_CLIENTS; i ++) {	
+			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+				continue;
+			if(m_mapStatsPlayers[i] == Server()->ClientName(i) && !m_Warmup)
+			{  
+				if ((Server()->Tick() % Server()->TickSpeed()) == 0) 
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundTimeInGame++;
+				
+				GameServer()->m_apPlayers[i]->m_Statistics.m_Distance += distance(GameServer()->m_apPlayers[i]->m_Statistics.m_OldPos, GameServer()->m_apPlayers[i]->m_Statistics.m_Pos);
+				GameServer()->m_apPlayers[i]->m_Statistics.m_OldPos = GameServer()->m_apPlayers[i]->m_Statistics.m_Pos;
+			}
+			else if (m_mapStatsPlayers[i] == Server()->ClientName(i))
+			{
+				GameServer()->m_apPlayers[i]->m_Statistics.m_OldPos = GameServer()->m_apPlayers[i]->m_Statistics.m_Pos;
+			}
+		}
+		std::queue<std::string> vTmpStats = Database->GetStats();
+		while (!vTmpStats.empty())
+		{	
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), vTmpStats.front().c_str());
+			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+			vTmpStats.pop();
+			
+		}
+	}
+}
+
+void IGameController::StopStats() 
+{
+	if(g_Config.m_SvDatabase){
+		for (int i = 0; i < MAX_CLIENTS; i ++) {
+			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+				continue;
+			if(m_mapStatsPlayers[i] == Server()->ClientName(i)){				
+				Database->AddRoundStats(i, m_mapStatsPlayers[i], 
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie,
+					GameServer()->m_apPlayers[i]->m_Latency.m_Avg,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundTimeInGame,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_WonRoundAsHuman,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundScore,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundDeath,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_Distance);
+			}
+		}
+		m_mapStatsPlayers.clear();
+
+		Database->RoundStats();
+	}
 }
 
 void IGameController::CureAll() {
@@ -414,13 +512,22 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 	if(pKiller == pVictim->GetPlayer())
+	{
 		pVictim->GetPlayer()->m_Score--; // suicide
+		pVictim->GetPlayer()->m_Statistics.m_RoundScore--;
+	}
 	else
 	{
 		if(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam())
+		{
 			pKiller->m_Score--; // teamkill
+			pKiller->m_Statistics.m_RoundScore--;
+		}
 		else
+		{
 			pKiller->m_Score++; // normal kill
+			pKiller->m_Statistics.m_RoundScore++;
+		}
 	}
 	if(Weapon == WEAPON_SELF)
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*3.0f;
@@ -603,6 +710,8 @@ void IGameController::Tick()
 			}
 		}
 	}
+	
+	TickStats();	
 
 	DoWincheck();
 }
@@ -779,13 +888,15 @@ void IGameController::DoWincheck()
 			}
 
 			// check score win condition
-			if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit) ||
-				(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
-			{
-				if(TopscoreCount == 1)
-					EndRound();
-				else
-					m_SuddenDeath = 1;
+			if(!g_Config.m_SvDatabase){
+				if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit) ||
+					(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
+				{
+					if(TopscoreCount == 1)
+						EndRound();
+					else
+						m_SuddenDeath = 1;
+				}
 			}
 		}
 	}
@@ -810,6 +921,8 @@ void IGameController::PostReset()
 			GameServer()->m_apPlayers[i]->m_Score = 0;
 			GameServer()->m_apPlayers[i]->m_ScoreStartTick = Server()->Tick();
 			GameServer()->m_apPlayers[i]->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
+			
 		}
 	}
+	StartStats();
 }

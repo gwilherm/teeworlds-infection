@@ -9,9 +9,9 @@ CDatabase::CDatabase(IConsole *pConsole)
 		m_runControlThread = true;		
 		m_ControlThread = new std::thread([=]() {
 			while(m_runControlThread){
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				std::this_thread::sleep_for(std::chrono::seconds(5));
 				while (!m_RankingThreads.empty())
-				{	
+				{
 					if( m_RankingThreads.front()->joinable())
 					{
 						m_RankingThreads.front()->join();

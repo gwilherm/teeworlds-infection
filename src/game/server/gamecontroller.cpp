@@ -270,6 +270,11 @@ void IGameController::GenerateSetOfNumbers() {
 }
 
 int IGameController::PickZombie() {
+	if (m_NextIdToPick >= MAX_CLIENTS) {
+		m_NextIdToPick = 0;
+		GenerateSetOfNumbers();
+	}
+
 	int id = m_aIdArray[m_NextIdToPick];
 	CPlayer *pPlayer = GameServer()->m_apPlayers[id];
 	if (!pPlayer) {
@@ -290,10 +295,8 @@ int IGameController::PickZombie() {
 
 	pPlayer->Infect();
 	pPlayer->m_Zombie = CPlayer::I_ZOMBIE;
-	if (++m_NextIdToPick >= MAX_CLIENTS) {
-		m_NextIdToPick = 0;
-		GenerateSetOfNumbers();
-	}
+	m_NextIdToPick++;
+
 	return id;
 }
 

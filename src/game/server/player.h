@@ -77,6 +77,20 @@ public:
 	int m_LastEmote;
 	int m_LastKill;
 
+	//stats
+	struct
+	{
+		int m_RoundKills;
+		int m_RoundKillsAsZombie;
+		int m_RoundTimeInGame;
+		bool m_WonRoundAsHuman;
+		int m_RoundScore;
+		int m_RoundDeath;
+		float m_Distance;
+		vec2 m_OldPos;
+		vec2 m_Pos;
+	} m_Statistics;
+	
 	// TODO: clean this up
 	struct
 	{

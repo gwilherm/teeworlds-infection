@@ -130,14 +130,32 @@ void CDatabase::RoundStats()
 		}
 	}
 	std::string Tmp;
-	
-	Tmp = "Top killer: " + ReplaceAll(m_aPlayers[TmpBestKiller].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestKiller].Kills) + " kills.";
+	qStats.push("=== Rounds Stats ===");
+
+	Tmp = "Top killer: ";
+	if(m_aPlayers[TmpBestKiller].Kills > 0)
+		Tmp += ReplaceAll(m_aPlayers[TmpBestKiller].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestKiller].Kills) + " kills.";
+	else
+		Tmp += "nobody...";
+
 	qStats.push(Tmp);
-	Tmp = "Top zombie: " + ReplaceAll(m_aPlayers[TmpBestZombie].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestZombie].KillsAsZombie) + " infects.";
+
+	Tmp = "Top zombie: ";
+	if(m_aPlayers[TmpBestZombie].KillsAsZombie > 0)
+		Tmp += ReplaceAll(m_aPlayers[TmpBestZombie].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestZombie].KillsAsZombie) + " infects.";
+	else
+		Tmp += "nobody...";
+
 	qStats.push(Tmp);
-	Tmp = "Top runner: " + ReplaceAll(m_aPlayers[TmpBestRunner].Name, std::string("''"), std::string("'")) + " with " + std::to_string((int)m_aPlayers[TmpBestRunner].Distance / (m_aPlayers[TmpBestRunner].TimeInGame == 0 ? 1 : m_aPlayers[TmpBestRunner].TimeInGame))+ " teexels/s.";
+
+	Tmp = "Top runner: ";
+	int tps = (int)m_aPlayers[TmpBestRunner].Distance / (m_aPlayers[TmpBestRunner].TimeInGame == 0 ? 1 : m_aPlayers[TmpBestRunner].TimeInGame);
+	if(tps > 0)
+		Tmp += ReplaceAll(m_aPlayers[TmpBestRunner].Name, std::string("''"), std::string("'")) + " with " + std::to_string(tps)+ " teexels/s.";
+	else
+		Tmp += "nobody...";
+
 	qStats.push(Tmp);
-	
 }
 
 void CDatabase::AddRoundStats(int id, std::string Name, int Kills, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)

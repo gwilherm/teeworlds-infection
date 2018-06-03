@@ -270,34 +270,31 @@ void IGameController::GenerateSetOfNumbers() {
 }
 
 int IGameController::PickZombie() {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        int id = m_aIdArray[m_NextIdToPick];
-        CPlayer *pPlayer = GameServer()->m_apPlayers[id];
-        if (!pPlayer) {
-            if (++ m_NextIdToPick >= MAX_CLIENTS) {
-                m_NextIdToPick = 0;
-				GenerateSetOfNumbers();
-			}
-            continue;
-        }
+	int id = m_aIdArray[m_NextIdToPick];
+	CPlayer *pPlayer = GameServer()->m_apPlayers[id];
+	if (!pPlayer) {
+		if (++ m_NextIdToPick >= MAX_CLIENTS) {
+			m_NextIdToPick = 0;
+			GenerateSetOfNumbers();
+		}
+		return PickZombie();
+	}
 
-        if (pPlayer->GetTeam() == TEAM_SPECTATORS) {
-            if (++ m_NextIdToPick >= MAX_CLIENTS) {
-                m_NextIdToPick = 0;
-				GenerateSetOfNumbers();
-			}
-            continue;
-        }
+	if (pPlayer->GetTeam() == TEAM_SPECTATORS) {
+		if (++ m_NextIdToPick >= MAX_CLIENTS) {
+			m_NextIdToPick = 0;
+			GenerateSetOfNumbers();
+		}
+		return PickZombie();
+	}
 
-        pPlayer->Infect();
-        pPlayer->m_Zombie = CPlayer::I_ZOMBIE;
-        if (++ m_NextIdToPick >= MAX_CLIENTS) {
-            m_NextIdToPick = 0;
-            GenerateSetOfNumbers();
-        }
-        return id;
-    }
-    return -1;
+	pPlayer->Infect();
+	pPlayer->m_Zombie = CPlayer::I_ZOMBIE;
+	if (++m_NextIdToPick >= MAX_CLIENTS) {
+		m_NextIdToPick = 0;
+		GenerateSetOfNumbers();
+	}
+	return id;
 }
 
 const int* IGameController::GetIdArray() const

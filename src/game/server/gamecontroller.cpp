@@ -254,7 +254,6 @@ void IGameController::StartRound()
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
 	CureAll();
-	StartStats();
 }
 
 void IGameController::ChangeMap(const char *pToMap)
@@ -593,7 +592,10 @@ void IGameController::Tick()
 	{
 		m_Warmup--;
 		if(!m_Warmup)
+		{
+			StartStats();
 			m_currentIZombie = PickZombie();
+		}
 	}
 
 	if(m_GameOverTick != -1)

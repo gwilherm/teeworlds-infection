@@ -268,8 +268,13 @@ void IGameController::StartStats()
 	if(g_Config.m_SvDatabase){
 		Database->NewRound();
 		for (int i = 0; i < MAX_CLIENTS; i ++) {
-			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
-				continue;
+			if (!GameServer()->m_apPlayers[i] ||
+				 GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||
+				 GameServer()->m_apPlayers[i]->IsBot())
+				 {
+					continue;
+				 }
+
 			m_mapStatsPlayers[i]=Server()->ClientName(i);
 			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills = 0;
 			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie = 0;
@@ -287,8 +292,13 @@ void IGameController::TickStats()
 {	
 	if(g_Config.m_SvDatabase){
 		for (int i = 0; i < MAX_CLIENTS; i ++) {	
-			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
-				continue;
+			if (!GameServer()->m_apPlayers[i] ||
+				 GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||
+				 GameServer()->m_apPlayers[i]->IsBot())
+				 {
+					continue;
+				 }
+
 			if(m_mapStatsPlayers[i] == Server()->ClientName(i) && !m_Warmup)
 			{  
 				if ((Server()->Tick() % Server()->TickSpeed()) == 0) 
@@ -318,9 +328,14 @@ void IGameController::StopStats()
 {
 	if(g_Config.m_SvDatabase){
 		for (int i = 0; i < MAX_CLIENTS; i ++) {
-			if (!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
-				continue;
-			if(m_mapStatsPlayers[i] == Server()->ClientName(i)){				
+			if (!GameServer()->m_apPlayers[i] ||
+				 GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||
+				 GameServer()->m_apPlayers[i]->IsBot())
+				 {
+					continue;
+				 }
+
+			if(m_mapStatsPlayers[i] == Server()->ClientName(i)){
 				Database->AddRoundStats(i, m_mapStatsPlayers[i], 
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills,
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie,

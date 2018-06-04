@@ -327,6 +327,7 @@ void IGameController::TickStats()
 void IGameController::StopStats() 
 {
 	if(g_Config.m_SvDatabase){
+		bool computeRoundStats = false;
 		for (int i = 0; i < MAX_CLIENTS; i ++) {
 			if (!GameServer()->m_apPlayers[i] ||
 				 GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||
@@ -336,6 +337,7 @@ void IGameController::StopStats()
 				 }
 
 			if(m_mapStatsPlayers[i] == Server()->ClientName(i)){
+				computeRoundStats = true;
 				Database->AddRoundStats(i, m_mapStatsPlayers[i], 
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills,
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie,
@@ -349,7 +351,8 @@ void IGameController::StopStats()
 		}
 		m_mapStatsPlayers.clear();
 
-		Database->RoundStats();
+		if(computeRoundStats)
+			Database->RoundStats();
 	}
 }
 

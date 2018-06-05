@@ -203,7 +203,7 @@ void IGameController::EndRound()
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 		if (!pPlayer)
 			continue;
-		if (!pPlayer->Infected() && Zombies > 2)
+		if (!pPlayer->Infected() && Zombies > 5)
 			pPlayer->m_Statistics.m_WonRoundAsHuman = true;
 
 	}
@@ -275,7 +275,8 @@ void IGameController::StartStats()
 				 }
 
 			m_mapStatsPlayers[i]=Server()->ClientName(i);
-			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsWeapons = 0;
+			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsBariers = 0;
 			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie = 0;
 			GameServer()->m_apPlayers[i]->m_Statistics.m_RoundTimeInGame = 0;
 			GameServer()->m_apPlayers[i]->m_Statistics.m_WonRoundAsHuman = false;
@@ -338,7 +339,8 @@ void IGameController::StopStats()
 			if(m_mapStatsPlayers[i] == Server()->ClientName(i)){
 				computeRoundStats = true;
 				Database->AddRoundStats(i, m_mapStatsPlayers[i], 
-					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKills,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsWeapons,
+					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsBariers,
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundKillsAsZombie,
 					GameServer()->m_apPlayers[i]->m_Latency.m_Avg,
 					GameServer()->m_apPlayers[i]->m_Statistics.m_RoundTimeInGame,

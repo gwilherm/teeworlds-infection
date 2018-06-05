@@ -44,7 +44,8 @@ CDatabase::CDatabase(IConsole *pConsole)
 				CREATE TABLE IF NOT EXISTS PLAYERS( \
 					name TEXT PRIMARY KEY, \
 					totalOfPlayedRounds INTEGER DEFAULT 0, \
-					totalOfKills INTEGER DEFAULT 0, \
+					totalOfKillsWeapons INTEGER DEFAULT 0, \
+					totalOfKillsBariers INTEGER DEFAULT 0, \
 					totalOfKillsAsZombie INTEGER DEFAULT 0, \
 					totalOfTimeInGame INTEGER DEFAULT 0, \
 					totalOfWinsAsHuman INTEGER DEFAULT 0, \
@@ -101,6 +102,7 @@ void CDatabase::RoundStats()
 { 	
 	bool TmpFirstLoop = true;
 	int TmpBestKiller = 0;
+	int TmpBestDefender = 0;
 	int TmpBestZombie = 0;
 	int TmpBestRunner = 0;
 	
@@ -112,11 +114,12 @@ void CDatabase::RoundStats()
 				TmpBestKiller = m_aPlayers[i].id;
 				TmpBestZombie = m_aPlayers[i].id;
 				TmpBestRunner = m_aPlayers[i].id;
+				TmpBestDefender = m_aPlayers[i].id;
 
 				TmpFirstLoop = false;
 			}
 			
-			if(m_aPlayers[i].Kills > m_aPlayers[TmpBestKiller].Kills){
+			if(m_aPlayers[i].KillsWeapons > m_aPlayers[TmpBestKiller].KillsWeapons){
 				TmpBestKiller = i;
 			}
 			
@@ -127,14 +130,26 @@ void CDatabase::RoundStats()
 			if(m_aPlayers[i].Distance > m_aPlayers[TmpBestRunner].Distance){
 				TmpBestRunner = i;
 			}
+			
+			if(m_aPlayers[i].KillsBariers > m_aPlayers[TmpBestDefender].KillsBariers){
+				TmpBestDefender = i;
+			}
 		}
 	}
 	std::string Tmp;
 	qStats.push("=== Rounds Stats ===");
 
 	Tmp = "Top killer: ";
-	if(m_aPlayers[TmpBestKiller].Kills > 0)
-		Tmp += ReplaceAll(m_aPlayers[TmpBestKiller].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestKiller].Kills) + " kills.";
+	if(m_aPlayers[TmpBestKiller].KillsWeapons > 0)
+		Tmp += ReplaceAll(m_aPlayers[TmpBestKiller].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestKiller].KillsWeapons) + " kills.";
+	else
+		Tmp += "nobody...";
+
+	qStats.push(Tmp);
+	
+	Tmp = "Top defender: ";
+	if(m_aPlayers[TmpBestDefender].KillsWeapons > 0)
+		Tmp += ReplaceAll(m_aPlayers[TmpBestDefender].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestDefender].KillsBariers) + " kills.";
 	else
 		Tmp += "nobody...";
 
@@ -158,12 +173,12 @@ void CDatabase::RoundStats()
 	qStats.push(Tmp);
 }
 
-void CDatabase::AddRoundStats(int id, std::string Name, int Kills, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)
+void CDatabase::AddRoundStats(int id, std::string Name, int KillsWeapons, int KillsBariers, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)
 {	
-	m_aPlayers[id] = {id, Name, Kills, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance};	
+	m_aPlayers[id] = {id, Name, KillsWeapons, KillsBariers, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance};	
 
 	std::string tName = ReplaceAll(Name, std::string("'"), std::string("''")); //sql iject protection
-	m_RankingThreads.push( new std::thread( [=] {taskAddRoundStats(id, tName, Kills, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance);} ) );
+	m_RankingThreads.push( new std::thread( [=] {taskAddRoundStats(id, tName, KillsWeapons, KillsBariers, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance);} ) );
 }
 
 void CDatabase::PlayerStats(std::string RequestedBy, std::string Name)
@@ -201,17 +216,18 @@ void CDatabase::taskPlayerStats(std::string RequestedBy, std::string Name)
 	m_mutexDatabaseFree.unlock();
 }
 
-void CDatabase::taskAddRoundStats(int id, std::string Name, int Kills, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)
+void CDatabase::taskAddRoundStats(int id, std::string Name, int KillsWeapons, int KillsBariers, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)
 {
 	m_mutexDatabaseFree.lock();	
 
 	char *zErrMsg = 0;
 	
 			
-	std::string sql = 	"INSERT OR IGNORE INTO PLAYERS  (name, totalOfPlayedRounds, totalOfKills, totalOfKillsAsZombie, totalOfTimeInGame, totalOfWinsAsHuman, totalOfScore, topScore, topNegativeScore, totalOfPlayerDeath, totalOfDistance) \
-						VALUES ('"+Name+"', 0, 0, 0, 1, 0, 0, 0, 0, 0, 0); \
+	std::string sql = 	"INSERT OR IGNORE INTO PLAYERS  (name, totalOfPlayedRounds, totalOfKillsWeapons, totalOfKillsBariers, totalOfKillsAsZombie, totalOfTimeInGame, totalOfWinsAsHuman, totalOfScore, topScore, topNegativeScore, totalOfPlayerDeath, totalOfDistance) \
+						VALUES ('"+Name+"', 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0); \
 						UPDATE PLAYERS SET totalOfPlayedRounds = totalOfPlayedRounds + 1 WHERE name = '"+Name+"'; \
-						UPDATE PLAYERS SET totalOfKills = totalOfKills + "+std::to_string(Kills)+" WHERE name = '"+Name+"'; \
+						UPDATE PLAYERS SET totalOfKillsWeapons = totalOfKillsWeapons + "+std::to_string(KillsWeapons)+" WHERE name = '"+Name+"'; \
+						UPDATE PLAYERS SET totalOfKillsBariers = totalOfKillsBariers + "+std::to_string(KillsBariers)+" WHERE name = '"+Name+"'; \
 						UPDATE PLAYERS SET totalOfKillsAsZombie = totalOfKillsAsZombie + "+std::to_string(KillsAsZombie)+" WHERE name = '"+Name+"'; \
 						UPDATE PLAYERS SET totalOfTimeInGame = totalOfTimeInGame + "+std::to_string(TimeInGame)+" WHERE name = '"+Name+"'; \
 						UPDATE PLAYERS SET totalOfWinsAsHuman = totalOfWinsAsHuman + "+ std::to_string(WonAsHuman ? 1 : 0) +" WHERE name = '"+Name+"'; \
@@ -248,7 +264,7 @@ void CDatabase::taskTop5(std::string RequestedBy, std::string Name)
 			sql = "SELECT "+std::to_string(i+1)+" as id, Name as runners, totalOfDistance as distance, totalOfTimeInGame as time FROM Players ORDER BY totalOfDistance/totalOfTimeInGame desc limit 1 offset "+std::to_string(i)+"";
 		}
 		if(Name == "killers"){		
-			sql = "SELECT "+std::to_string(i+1)+" as id, Name as killers, totalOfKills as kills, totalOfPlayedRounds as rounds FROM Players ORDER BY totalOfKills desc, totalOfPlayedRounds limit 1 offset "+std::to_string(i)+"";
+			sql = "SELECT "+std::to_string(i+1)+" as id, Name as killers, totalOfKillsWeapons as kills, totalOfPlayedRounds as rounds FROM Players ORDER BY totalOfKillsWeapons desc, totalOfPlayedRounds limit 1 offset "+std::to_string(i)+"";
 		}
 		if(Name == "zombies"){		
 			sql = "SELECT "+std::to_string(i+1)+" as id, Name as zombies, totalOfKillsAsZombie as kills, totalOfPlayedRounds as rounds FROM Players ORDER BY totalOfKillsAsZombie desc, totalOfPlayedRounds limit 1 offset "+std::to_string(i)+"";
@@ -331,7 +347,7 @@ int CDatabase::callbackRank(void *pointerCDatabase, int count, char **data, char
 	
 	for (int idx = 0; idx < count; idx++)
 	{
-		if(	std::string(columns[idx]) == "totalOfKills" )
+		if(	std::string(columns[idx]) == "totalOfKillsWeapons" )
 			Kills = std::stoi( std::string(data[idx]) );
 		if(	std::string(columns[idx]) == "totalOfPlayerDeath" )
 			Death = std::stoi( std::string(data[idx]) );

@@ -918,15 +918,13 @@ void IGameController::DoWincheck()
 			}
 
 			// check score win condition
-			if(!g_Config.m_SvDatabase){
-				if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit) ||
-					(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
-				{
-					if(TopscoreCount == 1)
-						EndRound();
-					else
-						m_SuddenDeath = 1;
-				}
+			if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit && !g_Config.m_SvDatabase) ||
+				(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
+			{
+				if(TopscoreCount == 1)
+					EndRound();
+				else
+					m_SuddenDeath = 1;
 			}
 		}
 	}

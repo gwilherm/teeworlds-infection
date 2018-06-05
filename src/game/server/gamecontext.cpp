@@ -119,7 +119,7 @@ void CGameContext::CreateHammerHit(vec2 Pos)
 }
 
 
-void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int PowerFactor)
+void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int PowerFactor, bool Firework)
 {
 	// create the event
 	CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion));
@@ -146,7 +146,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 			l = 1-clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
 			float Dmg = 6 * l;
 			if((int)Dmg)
-				apEnts[i]->TakeDamage(ForceDir*Dmg*PowerFactor, (int)Dmg, Owner, Weapon);
+				apEnts[i]->TakeDamage(ForceDir*Dmg*PowerFactor, (int)Dmg, Owner, Weapon, Firework);
 		}
 	}
 }
@@ -280,7 +280,7 @@ void CGameContext::CreateFirework(vec2 Pos, int Owner, vec2 ProjStartPos, vec2 D
 		ProjStartPos,
 		Direction,	
 		(int)(Server()->TickSpeed()*Tuning()->m_GrenadeLifetime),
-		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, true);
+		1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, 2);
 
     CreateSound(Pos, SOUND_GRENADE_FIRE);
 }
@@ -298,7 +298,7 @@ void CGameContext::doCreateFirework(int Owner, vec2 CurPos) {
 			Posi.x = Posi.x + i*10;
 			Posi.y = Posi.y + j*10;
 			vec2 Direction = vec2(i, j);
-			bool isFirework = (m_AmountOfFireworks > 0);
+			int isFirework = (m_AmountOfFireworks > 0) ? 2 : 1;
 			CProjectile *pProj1 = new CProjectile(&m_World, WEAPON_GRENADE, Owner, Posi, Direction, Tuning2, 1, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE, isFirework);
 		}
 	}

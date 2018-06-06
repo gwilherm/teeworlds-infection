@@ -81,7 +81,7 @@ public:
 	struct
 	{
 		int m_RoundKillsWeapons;
-		int m_RoundKillsBariers;
+		int m_RoundKillsBarrier;
 		int m_RoundKillsAsZombie;
 		int m_RoundTimeInGame;
 		bool m_WonRoundAsHuman;

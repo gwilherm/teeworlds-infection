@@ -84,8 +84,9 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
         }
 		if (Weapon == WEAPON_GUN || Weapon == WEAPON_HAMMER || Weapon == WEAPON_SHOTGUN || Weapon == WEAPON_GRENADE || Weapon == WEAPON_RIFLE)
 			pKiller->m_Statistics.m_RoundKillsWeapons++;
-		else
+		else if(Weapon == WEAPON_WORLD)
 			pKiller->m_Statistics.m_RoundKillsBariers++;
+
 		if(pKiller->Infected())
 			pKiller->m_Statistics.m_RoundKillsAsZombie++;
 		pVictim->GetPlayer()->m_Statistics.m_RoundDeath++;

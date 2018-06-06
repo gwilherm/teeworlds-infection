@@ -6,7 +6,6 @@
 #include <engine/shared/protocol.h>
 #include <game/server/gamecontext.h>
 
-#include <iostream>
 
 CGameControllerInfection::CGameControllerInfection(class CGameContext *pGameServer)
 : IGameController(pGameServer) {

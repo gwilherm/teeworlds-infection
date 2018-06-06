@@ -6,6 +6,7 @@
 #include <engine/shared/protocol.h>
 #include <game/server/gamecontext.h>
 
+#include <iostream>
 
 CGameControllerInfection::CGameControllerInfection(class CGameContext *pGameServer)
 : IGameController(pGameServer) {
@@ -81,7 +82,11 @@ int CGameControllerInfection::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKi
             pKiller->m_Score++;
 			pKiller->m_Statistics.m_RoundScore++;
         }
-		pKiller->m_Statistics.m_RoundKills++;
+		if (Weapon == WEAPON_GUN || Weapon == WEAPON_HAMMER || Weapon == WEAPON_SHOTGUN || Weapon == WEAPON_GRENADE || Weapon == WEAPON_RIFLE)
+			pKiller->m_Statistics.m_RoundKillsWeapons++;
+		else if(Weapon == WEAPON_WORLD)
+			pKiller->m_Statistics.m_RoundKillsBarrier++;
+
 		if(pKiller->Infected())
 			pKiller->m_Statistics.m_RoundKillsAsZombie++;
 		pVictim->GetPlayer()->m_Statistics.m_RoundDeath++;

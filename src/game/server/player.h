@@ -80,7 +80,8 @@ public:
 	//stats
 	struct
 	{
-		int m_RoundKills;
+		int m_RoundKillsWeapons;
+		int m_RoundKillsBarrier;
 		int m_RoundKillsAsZombie;
 		int m_RoundTimeInGame;
 		bool m_WonRoundAsHuman;

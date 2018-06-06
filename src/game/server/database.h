@@ -26,8 +26,9 @@ class CDatabase
 	struct Player{
 		int id;
 		std::string Name;
-        int Kills;
-        int KillsAsZombie;;
+        int KillsWeapons;
+		int KillsBarrier;
+        int KillsAsZombie;
 		int AvgPing;
 		int TimeInGame;
 		bool WonAsHuman;
@@ -42,7 +43,7 @@ class CDatabase
 
 	class IConsole *m_pConsole;
 	
-	void taskAddRoundStats(int id, std::string Name, int Kills, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance);
+	void taskAddRoundStats(int id, std::string Name, int KillsWeapons, int KillsBarrier, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance);
 	void taskPlayerStats(std::string RequestedBy, std::string Name);
 	void taskTop5(std::string RequestedBy, std::string Name);
 	
@@ -57,7 +58,7 @@ public:
 	CDatabase(IConsole *pConsole);
 	~CDatabase();
 	
-	void AddRoundStats(int id, std::string Name, int Kills, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance);
+	void AddRoundStats(int id, std::string Name, int KillsWeapons, int KillsBarrier, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance);
 	void NewRound();
 	void RoundStats();
 	void PlayerStats(std::string RequestedBy, std::string Name);

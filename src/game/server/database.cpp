@@ -148,7 +148,7 @@ void CDatabase::RoundStats()
 	qStats.push(Tmp);
 	
 	Tmp = "Top defender: ";
-	if(m_aPlayers[TmpBestDefender].KillsWeapons > 0)
+	if(m_aPlayers[TmpBestDefender].KillsBariers > 0)
 		Tmp += ReplaceAll(m_aPlayers[TmpBestDefender].Name, std::string("''"), std::string("'")) + " with " + std::to_string(m_aPlayers[TmpBestDefender].KillsBariers) + " kills.";
 	else
 		Tmp += "nobody...";

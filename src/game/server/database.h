@@ -17,12 +17,7 @@ class CDatabase
 	std::mutex m_mutexDatabaseFree;
 	
 	sqlite3 *db;
-	int rc;
 
-	std::string m_Name;
-	int m_Kills;
-	int m_KillsAsZombie;
-	
 	struct Player{
 		int id;
 		std::string Name;

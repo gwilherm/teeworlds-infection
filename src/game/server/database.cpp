@@ -1,7 +1,7 @@
 #include <engine/console.h>
 #include "database.h"
 #include <iomanip>
-#include <sstream> 
+#include <sstream>
 
 CDatabase::CDatabase(IConsole *pConsole)
 {
@@ -28,7 +28,7 @@ CDatabase::CDatabase(IConsole *pConsole)
 
 	char *zErrMsg = 0;
 	/*		OPEN/CREATE DATABASE	*/
-	rc = sqlite3_open("stats.db", &db);
+	int rc = sqlite3_open("stats.db", &db);
    
 	std::string status; 
 	if( rc ) {
@@ -175,7 +175,7 @@ void CDatabase::RoundStats()
 
 void CDatabase::AddRoundStats(int id, std::string Name, int KillsWeapons, int KillsBarrier, int KillsAsZombie, int AvgPing, int TimeInGame, bool WonAsHuman, int Score, int Death, float Distance)
 {	
-	m_aPlayers[id] = {id, Name, KillsWeapons, KillsBarrier, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance};	
+	m_aPlayers[id] = {id, Name, KillsWeapons, KillsBarrier, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance};
 
 	std::string tName = ReplaceAll(Name, std::string("'"), std::string("''")); //sql iject protection
 	m_RankingThreads.push( new std::thread( [=] {taskAddRoundStats(id, tName, KillsWeapons, KillsBarrier, KillsAsZombie, AvgPing, TimeInGame, WonAsHuman, Score, Death, Distance);} ) );
@@ -203,7 +203,7 @@ void CDatabase::taskPlayerStats(std::string RequestedBy, std::string Name)
 	char *zErrMsg = 0;
 	
 	std::string sql = "select *, (select count(*) from players pl1  where pl1.totalOfWinsAsHuman > pl2.totalOfWinsAsHuman)+1 as rank from Players pl2 where name == '"+Name+"'";
-	rc = sqlite3_exec(db, sql.c_str(), callbackRank, (void*) this, &zErrMsg);
+	int rc = sqlite3_exec(db, sql.c_str(), callbackRank, (void*) this, &zErrMsg);
 
 	// check for error 
 	if (rc != SQLITE_OK)
@@ -237,7 +237,7 @@ void CDatabase::taskAddRoundStats(int id, std::string Name, int KillsWeapons, in
 						UPDATE PLAYERS SET totalOfPlayerDeath = totalOfPlayerDeath + "+std::to_string(Death)+" WHERE name = '"+Name+"'; \
 						UPDATE PLAYERS SET totalOfDistance = totalOfDistance + "+std::to_string((int)Distance)+" WHERE name = '"+Name+"'; ";
 
-	rc = sqlite3_exec(db, sql.c_str(), NULL, NULL, &zErrMsg);
+	int rc = sqlite3_exec(db, sql.c_str(), NULL, NULL, &zErrMsg);
  
 	// check for error 
 	if (rc != SQLITE_OK) {
@@ -269,7 +269,7 @@ void CDatabase::taskTop5(std::string RequestedBy, std::string Name)
 		if(Name == "zombies"){		
 			sql = "SELECT "+std::to_string(i+1)+" as id, Name as zombies, totalOfKillsAsZombie as kills, totalOfPlayedRounds as rounds FROM Players ORDER BY totalOfKillsAsZombie desc, totalOfPlayedRounds limit 1 offset "+std::to_string(i)+"";
 		}
-		rc = sqlite3_exec(db, sql.c_str(), callbackTop5, (void*) this, &zErrMsg);
+		int rc = sqlite3_exec(db, sql.c_str(), callbackTop5, (void*) this, &zErrMsg);
 
 		// check for error 
 		if (rc != SQLITE_OK)

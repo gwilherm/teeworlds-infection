@@ -59,6 +59,7 @@ MACRO_CONFIG_INT(GfxNoclip, gfx_noclip, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "D
 MACRO_CONFIG_INT(SvWarmup, sv_warmup, 0, 0, 0, CFGFLAG_SERVER, "Number of seconds to do warmup before round starts")
 MACRO_CONFIG_STR(SvMotd, sv_motd, 900, "", CFGFLAG_SERVER, "Message of the day to display for the clients")
 MACRO_CONFIG_INT(SvTeamdamage, sv_teamdamage, 0, 0, 1, CFGFLAG_SERVER, "Team damage")
+MACRO_CONFIG_INT(SvSelfdamage, sv_selfdamage, 1, 0, 1, CFGFLAG_SERVER, "whether players can hurt themselves with grenade or not, default is 1")
 MACRO_CONFIG_STR(SvMaprotation, sv_maprotation, 768, "", CFGFLAG_SERVER, "Maps to rotate between")
 MACRO_CONFIG_INT(SvRoundsPerMap, sv_rounds_per_map, 1, 1, 100, CFGFLAG_SERVER, "Number of rounds on each map before rotating")
 MACRO_CONFIG_INT(SvRoundSwap, sv_round_swap, 1, 0, 1, CFGFLAG_SERVER, "Swap teams between rounds")
@@ -106,7 +107,9 @@ MACRO_CONFIG_INT(InfRandomIZombiePicking, inf_random_izombie_picking, 1, 0, 1, C
 
 //Server Bots
 MACRO_CONFIG_INT(SvBotSlots, sv_bot_slots, 2, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Number of slots to reserve for bots")
-MACRO_CONFIG_STR(SvBotSkin, sv_bot_skin, 24, "default", CFGFLAG_SERVER, "Bot skin")
+MACRO_CONFIG_STR(SvBotSkin, sv_bot_skin, 800, "default cammo warpaint cammostripes redbopp redstripe twinbop saddo limekitty brownbear bluestripe coala twintri pinky toptri bluekitty", CFGFLAG_SERVER, "Bot skin, separated by spaces, up to 16 skins")
+MACRO_CONFIG_STR(SvZombSkin, sv_zombie_skin, 24, "cammo", CFGFLAG_SERVER, "Zombie skin, default is cammo")
+MACRO_CONFIG_STR(SvBotClan, sv_bot_clan, 12, "Love", CFGFLAG_SERVER, "Bot clan")
 MACRO_CONFIG_INT(SvBotAllowHook, sv_bot_allow_hook, 1, 0, 1, CFGFLAG_SERVER, "Bots are allowed to hook")
 MACRO_CONFIG_INT(SvBotAllowMove, sv_bot_allow_move, 1, 0, 1, CFGFLAG_SERVER, "Bots are allowed to move")
 MACRO_CONFIG_INT(SvBotAllowFire, sv_bot_allow_fire, 1, 0, 1, CFGFLAG_SERVER, "Bots fire")

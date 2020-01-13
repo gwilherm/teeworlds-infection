@@ -2,13 +2,14 @@
 #define GAME_SERVER_BOT_H
 
 #include <base/vmath.h>
+#include <engine/shared/config.h>
 
 #include "gamecontext.h"
 #include "botengine.h"
 
 #include "ai/genetics.h"
 
-const char g_BotClan[12] = "Love";
+const char g_BotClan[12] = {*g_Config.m_SvBotClan};
 const char g_BotName[MAX_CLIENTS][16] = {
 	"Anna",
 	"Bob",
@@ -27,6 +28,7 @@ const char g_BotName[MAX_CLIENTS][16] = {
 	"Ondine",
 	"Platon"
 };
+extern char g_BotSkin[MAX_CLIENTS][16]; //made this one extern to avoid a segmentation fault and weird compilation -skay
 
 #define	BOT_HOOK_DIRS	32
 
@@ -127,6 +129,7 @@ public:
 	int m_GenomeTick;
 
 	const char *GetName();
+	const char *GetSkin();
 	const char *GetClan() { return g_BotClan; }
 
 	int GetID() { return m_SnapID; }

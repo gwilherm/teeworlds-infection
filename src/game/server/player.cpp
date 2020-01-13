@@ -148,13 +148,13 @@ void CPlayer::Snap(int SnappingClient)
 		StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
         StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : Server()->ClientClan(m_ClientID));
 		pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
-		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : m_TeeInfos.m_SkinName);
+		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? g_Config.m_SvZombSkin : m_TeeInfos.m_SkinName);
 	}
 	else {
 		StrToInts(&pClientInfo->m_Name0, 4, m_pBot->GetName());
-        StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : m_pBot->GetClan());
+        StrToInts(&pClientInfo->m_Clan0, 3, (m_Zombie != HUMAN)? (m_Zombie == ZOMBIE)? "Zombie" : "iZombie" : g_Config.m_SvBotClan); //bot clan changing added -skay
 		pClientInfo->m_Country = 0;
-		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? "cammo" : g_Config.m_SvBotSkin);
+		StrToInts(&pClientInfo->m_Skin0, 6, m_Zombie ? g_Config.m_SvZombSkin : m_pBot->GetSkin()); //per bot skin changing -skay
 	}
 
 	pClientInfo->m_UseCustomColor = m_Zombie ? true : false;

@@ -15,6 +15,28 @@
 #include "entities/flag.h"
 #include "entities/pickup.h"
 
+//default skins for bots. (added per-bot skin changing, works with non-vanilla skins too) -skay
+char g_BotSkin[MAX_CLIENTS][16] = {
+	"default",
+	"cammo",
+	"warpaint",
+	"cammostripes",
+	"redbopp",
+	"redstripe",
+	"twinbop",
+	"saddo",
+	"limmekitty",
+	"brownbear",
+	"bluestripe",
+	"coala",
+	"twintri",
+	"pinky",
+	"bluekitty",
+	"toptri"
+
+};
+
+
 CBot::CBot(CBotEngine *pBotEngine, CPlayer *pPlayer) : m_Genetics(CTarget::NUM_TARGETS,10)
 {
 	m_pBotEngine = pBotEngine;
@@ -799,6 +821,15 @@ void CBot::Snap(int SnappingClient)
 
 const char *CBot::GetName() {
 	return g_BotName[m_pPlayer->GetCID()];
+}
+
+const char *CBot::GetSkin() {
+        char *temp = strtok (g_Config.m_SvBotSkin, " ");
+        for (size_t i = 0; i < MAX_CLIENTS && temp; ++i){
+            strcpy (g_BotSkin[i], temp);
+            temp = strtok (NULL, " ");
+        }
+        return g_BotSkin[m_pPlayer->GetCID()];
 }
 
 const char *CBot::GetRepartee() {

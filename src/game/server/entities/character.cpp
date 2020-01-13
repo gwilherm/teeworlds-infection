@@ -832,9 +832,11 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Firew
     if (GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->Infected() && !m_pPlayer->Infected())
         m_pPlayer->Infect(From, Weapon);
 
-	// m_pPlayer only inflicts half damage on self
-	if(From == m_pPlayer->GetCID())
+	// m_pPlayer only inflicts half damage on self, if selfdamage is off: damage is 0 -skay
+	if(From == m_pPlayer->GetCID() && g_Config.m_SvSelfdamage == 1)
 		Dmg = max(1, Dmg/2);
+    else if(From == m_pPlayer->GetCID() && g_Config.m_SvSelfdamage == 0)
+        Dmg = 0;
 
 	m_DamageTaken++;
 
@@ -850,7 +852,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Firew
 		GameServer()->CreateDamageInd(m_Pos, 0, Dmg);
 	}
 
-	if(m_pPlayer->m_Zombie && GameServer()->m_apPlayers[From]->m_Zombie && Weapon == WEAPON_HAMMER)
+                //bug: player only deals selfdamage if has armor (no selfdamage if no armor) fix: changed "zombie" to "infected" -skay
+	if(m_pPlayer->Infected() && GameServer()->m_apPlayers[From]->m_Zombie && Weapon == WEAPON_HAMMER)
 	{
 		//Lets be nice to our zombie mates
 		if(Dmg)
@@ -903,10 +906,12 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Firew
 				}
 			}
 
-			if (From == m_pPlayer->GetCID() && Firework)
-			{		
-				Dmg = 0;
-			}
+                // m_pPlayer only inflicts half damage on self, if selfdamage is off: damage is 0. this one is for fireworks -skay
+            	if(From == m_pPlayer->GetCID() && g_Config.m_SvSelfdamage == 1 && Firework)
+        		Dmg = max(1, Dmg/2);
+                else if(From == m_pPlayer->GetCID() && g_Config.m_SvSelfdamage == 0 && Firework)
+                Dmg = 0;
+
 			m_Health -= Dmg;
 		}
 	}
